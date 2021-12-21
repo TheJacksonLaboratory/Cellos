@@ -47,7 +47,7 @@ def load_images (directory, idx):
     return image
 
 def add_2channels(image1, image2, idx):
-    image = np.zeros((1080, 1080 ,idx))
+    image = np.zeros((1080, 1080 ,idx ,3))
     image[:,:,:,0] = image1/image1.max() #changed btn 0-1
     image[:,:,:,1] = image2/image2.max()  #multiplied by 2 bcse green color is faint
     return image
@@ -57,12 +57,12 @@ def preprocessing(img):
     binarized =np.where(img_grey>0.03, 1, 0)
     processed = morphology.binary_dilation(morphology.binary_opening(binarized.max(axis=2).astype(bool),selem=np.ones((8,8))),
                                             selem=np.ones((10,10))).astype(int)
-    clean_img=img*processed[:,:,np.newaxis]
+    clean_img=img*processed[:,:,np.newaxis,np.newaxis]
 
     return clean_img
 
 def filter_image(image):
-    #image_grey= rgb2gray(image)
+    image_grey= rgb2gray(image)
     #image_2um_blur = np.zeros([1080, 1080,idx,3])
     image_2um_blur = np.zeros(image.shape)
     
@@ -82,38 +82,38 @@ def filter_image(image):
     return mask_image_removed_small_objects
 
 #fx for plotting
-image_2um_f2 = load_images (image_prefix+well_loc+'f02p{:02d}-ch3sk1fk1fl1.tiff', 100)
-#image_2um_2_f2= load_images (image_prefix+well_loc+'f02p{:02d}-ch1sk1fk1fl1.tiff', 100)
-#image_2um_f2 = add_2channels(image_2um_1_f2, image_2um_2_f2, 100)
+image_2um_1_f2 = load_images (image_prefix+well_loc+'f02p{:02d}-ch2sk1fk1fl1.tiff', 100)
+image_2um_2_f2= load_images (image_prefix+well_loc+'f02p{:02d}-ch1sk1fk1fl1.tiff', 100)
+image_2um_f2 = add_2channels(image_2um_1_f2, image_2um_2_f2, 100)
 image_2um_f2_seg = preprocessing(image_2um_f2)
 image_2um_f2_seg = filter_image(image_2um_f2_seg)
 
-image_2um_f3 = load_images (image_prefix+well_loc+'f03p{:02d}-ch3sk1fk1fl1.tiff', 100)
-#image_2um_2_f3 = load_images (image_prefix+well_loc+'f03p{:02d}-ch1sk1fk1fl1.tiff', 100)
-#image_2um_f3 = add_2channels(image_2um_1_f3, image_2um_2_f3, 100)
+image_2um_1_f3 = load_images (image_prefix+well_loc+'f03p{:02d}-ch2sk1fk1fl1.tiff', 100)
+image_2um_2_f3 = load_images (image_prefix+well_loc+'f03p{:02d}-ch1sk1fk1fl1.tiff', 100)
+image_2um_f3 = add_2channels(image_2um_1_f3, image_2um_2_f3, 100)
 image_2um_f3_seg = preprocessing(image_2um_f3)
 image_2um_f3_seg = filter_image(image_2um_f3_seg)
 
-image_2um_f4 = load_images (image_prefix+well_loc+'f04p{:02d}-ch3sk1fk1fl1.tiff', 100)
-#image_2um_2_f4 = load_images (image_prefix+well_loc+'f04p{:02d}-ch1sk1fk1fl1.tiff', 100)
-#image_2um_f4 = add_2channels(image_2um_1_f4, image_2um_2_f4, 100)
+image_2um_1_f4 = load_images (image_prefix+well_loc+'f04p{:02d}-ch2sk1fk1fl1.tiff', 100)
+image_2um_2_f4 = load_images (image_prefix+well_loc+'f04p{:02d}-ch1sk1fk1fl1.tiff', 100)
+image_2um_f4 = add_2channels(image_2um_1_f4, image_2um_2_f4, 100)
 image_2um_f4_seg = preprocessing(image_2um_f4)
 image_2um_f4_seg = filter_image(image_2um_f4_seg)
 
-image_2um_f5 = load_images (image_prefix+well_loc+'f05p{:02d}-ch3sk1fk1fl1.tiff', 100)
-#image_2um_2_f5 = load_images (image_prefix+well_loc+'f05p{:02d}-ch1sk1fk1fl1.tiff', 100)
-#image_2um_f5 = add_2channels(image_2um_1_f5, image_2um_2_f5, 100)
+image_2um_1_f5 = load_images (image_prefix+well_loc+'f05p{:02d}-ch2sk1fk1fl1.tiff', 100)
+image_2um_2_f5 = load_images (image_prefix+well_loc+'f05p{:02d}-ch1sk1fk1fl1.tiff', 100)
+image_2um_f5 = add_2channels(image_2um_1_f5, image_2um_2_f5, 100)
 image_2um_f5_seg = preprocessing(image_2um_f5)
 image_2um_f5_seg = filter_image(image_2um_f5_seg)
 
-image_2um_f6= load_images (image_prefix+well_loc+'f06p{:02d}-ch3sk1fk1fl1.tiff', 100)
-#image_2um_2_f6= load_images (image_prefix+well_loc+'f06p{:02d}-ch1sk1fk1fl1.tiff', 100)
-#image_2um_f6 = add_2channels(image_2um_1_f6, image_2um_2_f6, 100)
+image_2um_1_f6= load_images (image_prefix+well_loc+'f06p{:02d}-ch2sk1fk1fl1.tiff', 100)
+image_2um_2_f6= load_images (image_prefix+well_loc+'f06p{:02d}-ch1sk1fk1fl1.tiff', 100)
+image_2um_f6 = add_2channels(image_2um_1_f6, image_2um_2_f6, 100)
 image_2um_f6_seg = preprocessing(image_2um_f6)
 image_2um_f6_seg = filter_image(image_2um_f6_seg)
 
 def stitch_row (img1, img2):
-    img1_shift = img1[:,:-80,:]
+    img1_shift = img1[:,:-80,:,:]
     concat = np.concatenate((img1_shift,img2), axis =1)
     return concat
 
