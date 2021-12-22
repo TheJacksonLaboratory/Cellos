@@ -1,6 +1,7 @@
 #Create a stitched well from the original files and save as zarr
 # imports
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 #global variable definition(all upper case variables)
 OVERLAP_X = 80
@@ -14,8 +15,19 @@ def load_images(well,plate_path):
     return True
 
 
-def determine_well_layout(plate_path):
-    tree = ET.parse(plate_path + "Index.idx.xml")
+def parse_index_file(index_file_path):
+    """Parse Index.idx.xml
+
+    args:
+        index_file_path : string or pathlike; Path to index file for plate
+    returns:
+        number of fields in well
+        number of planes per image
+        number of channels per image
+    """
+
+    indexp = Path(index_file_path)
+    tree = ET.parse(indexp)
     root = tree.getroot()
     for child in root:
         if child.tag == "{http://www.perkinelmer.com/PEHH/HarmonyV5}Wells":
@@ -30,7 +42,7 @@ def determine_well_layout(plate_path):
 
 # script 
 def main():
-    determine_well_layout(PLATE_PATH)
+    parse_index_file('Index.idx.xml')
     return True
 
 if __name__ == "__main__":
