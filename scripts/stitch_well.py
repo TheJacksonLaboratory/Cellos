@@ -4,14 +4,15 @@ import re
 import zarr
 import numpy as np
 import xml.etree.ElementTree as ET
+from numcodecs import Blosc
 from pathlib import Path
 
 #global variable definition(all upper case variables)
-LAYOUT_25 = np.array([ 2, 3, 4, 5, 6],
-                     [11,10, 9, 8, 7]
-                     [12,13, 1,14,15],
-                     [20,19,18,17,16],
-                     [21,22,23,24,25])
+LAYOUT_25 = np.array([[ 2, 3, 4, 5, 6],
+                      [11,10, 9, 8, 7],
+                      [12,13, 1,14,15],
+                      [20,19,18,17,16],
+                      [21,22,23,24,25]])
 PLANE_SIZE = (1080, 1080)
 OVERLAP_X = 80
 OVERLAP_Y = 80
@@ -95,10 +96,36 @@ def generate_zarr_container(zarr_path, nfield, nplane, nchannel, overlap, plane_
     else:
         raise ValueError(f'Wells with {nfield} fields are not supported')
 
+    row_overlap_sum = (layout.shape[0] - 1) * overlap[0]
+    col_overlap_sum = (layout.shape[1] - 1) * overlap[1]
+
+    row_shape = (plane_size[0] * layout.shape[0]) - row_overlap_sum
+    col_shape = (plane_size[1] * layout.shape[1]) - col_overlap_sum
+
+    store = zarr.DirectoryStore(zarr_path)
+    zarr_con = zarr.empty([nchannel, nplane, row_shape, col_shape],
+                           dtype=np.uint16,
+                           compressor=Blosc(cname='zstd',
+                                            clevel=1,
+                                            shuffle=Blosc.BITSHUFFLE),
+                           read_only=False)
+
+    return zarr_con
+
+
+
+
 # script 
 def main():
-    nfield, nplane, nchannel = parse_index_file('Index.idx.xml', well_col=WELL_COLUMN, well_row=WELL_ROW)
-    print(nfield, nplane, nchannel)
+    nfield, nplane, nchannel = parse_index_file('Index.idx.xml',
+                                                well_col=WELL_COLUMN,
+                                                well_row=WELL_ROW)
+    zarr_con = generate_zarr_container('test.zarr',
+                                       nfield,
+                                       nplane,
+                                       nchannel,
+                                       overlap=(OVERLAP_Y, OVERLAP_X),
+                                       plane_size=PLANE_SIZE)
 
 if __name__ == "__main__":
     main()
