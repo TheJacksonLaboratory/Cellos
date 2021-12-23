@@ -1,10 +1,18 @@
 #Create a stitched well from the original files and save as zarr
 # imports
 import re
+import zarr
+import numpy as np
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
 #global variable definition(all upper case variables)
+LAYOUT_25 = np.array([ 2, 3, 4, 5, 6],
+                     [11,10, 9, 8, 7]
+                     [12,13, 1,14,15],
+                     [20,19,18,17,16],
+                     [21,22,23,24,25])
+PLANE_SIZE = (1080, 1080)
 OVERLAP_X = 80
 OVERLAP_Y = 80
 WELL_ROW = 2
@@ -22,9 +30,9 @@ def parse_index_file(index_file_path, well_row, well_col):
     args:
         index_file_path : string or pathlike; Path to index file for plate
     returns:
-        number of fields in well
-        number of planes per image
-        number of channels per image
+        nfield : number of fields in well
+        nplane : number of planes per image
+        nchannel : number of channels per image
     """
 
     indexp = Path(index_file_path)
@@ -57,10 +65,40 @@ def parse_index_file(index_file_path, well_row, well_col):
             channel_match = re.search('(?<=R)[0-9]+', image_id)
             channels_list.append(int(channel_match.group(0)))
 
+    fields_list = np.array(fields_list)
+    planes_list = np.array(planes_list)
+    channels_list = np.array(channels_list)
+
+    assert fields_list.min() == 1
+    assert planes_list.min() == 1
+    assert channels_list.min() == 1
+
+    return (fields_list.max(), planes_list.max(), channels_list.max())
+
+
+def generate_zarr_container(zarr_path, nfield, nplane, nchannel, overlap, plane_size):
+    """Generate an empty zarr of the appropriate size.
+
+    args:
+        zarr_path : pathlike; path to where zarr will be stored
+        nfield : int; number of fields in the well
+        nplane : int; number of planes per image
+        nchannel : int; number of channels per image
+        overlap : tuple; overlap between tiles (row [y], col [x])
+        plane_size : tuple; shape of each plane (row [y], col [x])
+
+    returns:
+        zarr_con : zarr.core.Array
+    """
+    if nfield == 25:
+        layout = LAYOUT_25
+    else:
+        raise ValueError(f'Wells with {nfield} fields are not supported')
+
 # script 
 def main():
-    parse_index_file('Index.idx.xml', well_col=WELL_COLUMN, well_row=WELL_ROW)
-    return True
+    nfield, nplane, nchannel = parse_index_file('Index.idx.xml', well_col=WELL_COLUMN, well_row=WELL_ROW)
+    print(nfield, nplane, nchannel)
 
 if __name__ == "__main__":
     main()
