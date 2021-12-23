@@ -126,6 +126,7 @@ def main():
                                        nchannel,
                                        overlap=(OVERLAP_Y, OVERLAP_X),
                                        plane_size=PLANE_SIZE)
-
+    zarr_con[...] = 3
+    print(zarr_con[...])
 if __name__ == "__main__":
     main()
