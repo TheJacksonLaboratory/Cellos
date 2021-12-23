@@ -6,6 +6,7 @@ import numpy as np
 import xml.etree.ElementTree as ET
 from numcodecs import Blosc
 from pathlib import Path
+from skimage import io
 
 #global variable definition(all upper case variables)
 LAYOUT_25 = np.array([[ 2, 3, 4, 5, 6],
@@ -77,7 +78,7 @@ def parse_index_file(index_file_path, well_row, well_col):
     return (fields_list.max(), planes_list.max(), channels_list.max())
 
 
-def generate_zarr_container(zarr_path, nfield, nplane, nchannel, overlap, plane_size):
+def generate_containers(zarr_path, nfield, nplane, nchannel, overlap, plane_size):
     """Generate an empty zarr of the appropriate size.
 
     args:
@@ -90,6 +91,7 @@ def generate_zarr_container(zarr_path, nfield, nplane, nchannel, overlap, plane_
 
     returns:
         zarr_con : zarr.core.Array
+        segment_con : np.array
     """
     if nfield == 25:
         layout = LAYOUT_25
@@ -105,14 +107,29 @@ def generate_zarr_container(zarr_path, nfield, nplane, nchannel, overlap, plane_
     store = zarr.DirectoryStore(zarr_path)
     zarr_con = zarr.empty([nchannel, nplane, row_shape, col_shape],
                            dtype=np.uint16,
+                           store=store,
                            compressor=Blosc(cname='zstd',
                                             clevel=1,
                                             shuffle=Blosc.BITSHUFFLE),
                            read_only=False)
 
-    return zarr_con
+    segment_con = np.zeros([nchannel, nplane, row_shape, col_shape], dtype=np.bool8)
+
+    return zarr_con, segment_con
 
 
+def get_filename(row, col, field, plane, channel):
+    fn = f"r{row:02}c{col:02}f{field:02}p{plane:02}-ch{channel}sk1fk1fl1.tiff"
+    return fn
+
+
+def get_field_pixels(field, row, col, nplane, nchannel, images_path=PLATE_PATH):
+    images_path = Path(images_path)
+    orig_pixels_array = np.zeros([nchannel, nplane, *PLANE_SIZE])
+    for ch in range(1, nchannel + 1):
+        for pl in range(1, nplane + 1):
+            fn = get_filename(row, col, field, pl, ch)
+            orig_pixels_array[ch - 1, pl - 1, ...] = io.imread(images_path / fn)
 
 
 # script 
@@ -120,13 +137,29 @@ def main():
     nfield, nplane, nchannel = parse_index_file('Index.idx.xml',
                                                 well_col=WELL_COLUMN,
                                                 well_row=WELL_ROW)
-    zarr_con = generate_zarr_container('test.zarr',
-                                       nfield,
-                                       nplane,
-                                       nchannel,
-                                       overlap=(OVERLAP_Y, OVERLAP_X),
-                                       plane_size=PLANE_SIZE)
-    zarr_con[...] = 3
-    print(zarr_con[...])
+    zarr_con, segment_con = generate_containers('test.zarr',
+                                                nfield,
+                                                nplane,
+                                                nchannel,
+                                                overlap=(OVERLAP_Y,
+                                                         OVERLAP_X),
+                                                plane_size=PLANE_SIZE)
+
+    '''
+    Next step:
+        1) Loop over each field
+        2) Load relevant images into a numpy array (original pixels array)
+        3) perform segmentation on the numpy array (segmentation array)
+        4) load original pixels array into zarr_con
+        5) load segmentation array into segment_con
+    '''
+
+    for f in range(1, nfield + 1):
+        orig_pixel_array = get_field_pixels(f,
+                                            nplane,
+                                            nchannel,
+                                            row=WELL_ROW,
+                                            col=WELL_COLUMN)
+
 if __name__ == "__main__":
     main()
