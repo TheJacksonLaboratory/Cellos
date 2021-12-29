@@ -149,19 +149,23 @@ def main():
 
     '''
     Next step:
-        1) Loop over each field
-        2) Load relevant images into a numpy array (original pixels array)
+      X 1) Loop over each field
+      X 2) Load relevant images into a numpy array (original pixels array)
         3) perform segmentation on the numpy array (segmentation array)
-        4) load original pixels array into zarr_con
+      X 4) load original pixels array into zarr_con
         5) load segmentation array into segment_con
     '''
 
     for f in range(1, nfield + 1):
+        print(f'Processing field: {f}')
         orig_pixel_array = get_field_pixels(f,
                                             WELL_ROW,
                                             WELL_COLUMN,
                                             nplane,
                                             nchannel)
-        print(orig_pixel_array.shape)
+        fposr, fposc = np.where(LAYOUT_25 == f)
+        rowstart = int((PLANE_SIZE[0] - OVERLAP_Y) * fposr)
+        colstart = int((PLANE_SIZE[1] - OVERLAP_X) * fposc)
+        zarr_con[:, :, rowstart:rowstart+PLANE_SIZE[0], colstart:colstart+PLANE_SIZE[1]] = orig_pixel_array
 if __name__ == "__main__":
     main()
