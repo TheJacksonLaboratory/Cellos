@@ -111,6 +111,7 @@ def generate_containers(zarr_path, nfield, nplane, nchannel, overlap, plane_size
                            compressor=Blosc(cname='zstd',
                                             clevel=1,
                                             shuffle=Blosc.BITSHUFFLE),
+                           overwrite=True,
                            read_only=False)
 
     segment_con = np.zeros([nchannel, nplane, row_shape, col_shape], dtype=np.bool8)
@@ -130,11 +131,12 @@ def get_field_pixels(field, row, col, nplane, nchannel, images_path=PLATE_PATH):
         for pl in range(1, nplane + 1):
             fn = get_filename(row, col, field, pl, ch)
             orig_pixels_array[ch - 1, pl - 1, ...] = io.imread(images_path / fn)
+    return orig_pixels_array
 
 
 # script 
 def main():
-    nfield, nplane, nchannel = parse_index_file('Index.idx.xml',
+    nfield, nplane, nchannel = parse_index_file(Path(PLATE_PATH) / 'Index.idx.xml',
                                                 well_col=WELL_COLUMN,
                                                 well_row=WELL_ROW)
     zarr_con, segment_con = generate_containers('test.zarr',
@@ -156,10 +158,10 @@ def main():
 
     for f in range(1, nfield + 1):
         orig_pixel_array = get_field_pixels(f,
+                                            WELL_ROW,
+                                            WELL_COLUMN,
                                             nplane,
-                                            nchannel,
-                                            row=WELL_ROW,
-                                            col=WELL_COLUMN)
-
+                                            nchannel)
+        print(orig_pixel_array.shape)
 if __name__ == "__main__":
     main()
