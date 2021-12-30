@@ -133,6 +133,27 @@ def get_field_pixels(field, row, col, nplane, nchannel, images_path=PLATE_PATH):
             orig_pixels_array[ch - 1, pl - 1, ...] = io.imread(images_path / fn)
     return orig_pixels_array
 
+def segment_image(image):
+    img= image[:2,:,:,:]
+    #preprocessing
+    img_grey= rgb2gray(img)
+    binarized =np.where(img_grey>0.03, 1, 0)
+    processed = io.morphology.binary_dilation(morphology.binary_opening(binarized.max(axis=2).astype(bool),selem=np.ones((8,8))),
+                                            selem=np.ones((10,10))).astype(int)
+    clean_img=img*processed[:,:,np.newaxis,np.newaxis]
+    #segmentation process
+    image_grey= rgb2gray(clean_img)
+    #sigma is the rayon of a triangle you are taking in this method, the bigger the sigma you take big objects
+    image_2um_blur = gaussian(image_grey, sigma=0.5, mode = 'reflect',
+                              multichannel=True , preserve_range=True) #, sigma=10
+    #threshold triangle 
+    mask_triangle_2um = image_2um_blur > io.filters.threshold_triangle(image_2um_blur.flatten())
+    #Remove small objects
+    seg_image = io.morphology.remove_small_objects(mask_triangle_2um, min_size=8000)
+    #label 
+#    labeled_blobs_2um_big,_ = ndi.label(mask_image_removed_small_objects)
+
+    return seg_image
 
 # script 
 def main():
