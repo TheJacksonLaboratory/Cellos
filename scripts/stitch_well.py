@@ -78,7 +78,7 @@ def parse_index_file(index_file_path, well_row, well_col):
     return (fields_list.max(), planes_list.max(), channels_list.max())
 
 
-def generate_containers(zarr_path, nfield, nplane, nchannel, overlap, plane_size):
+def generate_containers(zarr_path, layout, nplane, nchannel, overlap, plane_size):
     """Generate an empty zarr of the appropriate size.
 
     args:
@@ -93,10 +93,6 @@ def generate_containers(zarr_path, nfield, nplane, nchannel, overlap, plane_size
         zarr_con : zarr.core.Array
         segment_con : np.array
     """
-    if nfield == 25:
-        layout = LAYOUT_25
-    else:
-        raise ValueError(f'Wells with {nfield} fields are not supported')
 
     row_overlap_sum = (layout.shape[0] - 1) * overlap[0]
     col_overlap_sum = (layout.shape[1] - 1) * overlap[1]
@@ -158,27 +154,24 @@ def main():
     nfield, nplane, nchannel = parse_index_file(Path(PLATE_PATH) / 'Index.idx.xml',
                                                 well_col=WELL_COLUMN,
                                                 well_row=WELL_ROW)
+    if nfield == 25:
+        layout = LAYOUT_25
+    else:
+        raise ValueError(f'Wells with {nfield} fields are not supported') 
+
     zarr_con, segment_con = generate_containers('test.zarr',
-                                                nfield,
+                                                layout,
                                                 nplane,
                                                 nchannel,
                                                 overlap=(OVERLAP_Y,
                                                          OVERLAP_X),
                                                 plane_size=PLANE_SIZE)
 
-    '''
-    Next step:
-      X 1) Loop over each field
-      X 2) Load relevant images into a numpy array (original pixels array)
-        3) perform segmentation on the numpy array (segmentation array)
-      X 4) load original pixels array into zarr_con
-        5) load segmentation array into segment_con
-    '''
 
     for f in range(1, nfield + 1):
         print(f'Processing field: {f}')
         # Get field positions
-        fposr, fposc = np.where(LAYOUT_25 == f)
+        fposr, fposc = np.where(layout == f)
         rowstart = int((PLANE_SIZE[0] - OVERLAP_Y) * fposr)
         colstart = int((PLANE_SIZE[1] - OVERLAP_X) * fposc)
 
@@ -195,6 +188,8 @@ def main():
 
         # Insert original into zarr_con
         zarr_con[:, :, rowstart:rowstart+PLANE_SIZE[0], colstart:colstart+PLANE_SIZE[1]] = orig_pixel_array
+
+# TODO: Detect organoids and write out as csv
 
 if __name__ == "__main__":
     main()
