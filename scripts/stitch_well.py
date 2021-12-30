@@ -6,7 +6,7 @@ import numpy as np
 import xml.etree.ElementTree as ET
 from numcodecs import Blosc
 from pathlib import Path
-from skimage import io, color, morphology, filters
+from skimage import io, morphology, filters
 
 #global variable definition(all upper case variables)
 LAYOUT_25 = np.array([[ 2, 3, 4, 5, 6],
@@ -114,7 +114,7 @@ def generate_containers(zarr_path, nfield, nplane, nchannel, overlap, plane_size
                            overwrite=True,
                            read_only=False)
 
-    segment_con = np.zeros([nchannel, nplane, row_shape, col_shape], dtype=np.bool8)
+    segment_con = np.zeros([nplane, row_shape, col_shape], dtype=np.bool8)
 
     return zarr_con, segment_con
 
@@ -134,16 +134,16 @@ def get_field_pixels(field, row, col, nplane, nchannel, images_path=PLATE_PATH):
     return orig_pixels_array
 
 def segment_image(image):
-    img= image[:2,:,:,:]
-    img_grey= color.rgb2gray(img)
-    binarized =np.where(img_grey>0.03, 1, 0)
-    bin_opened = morphology.binary_opening(binarized.max(axis=2).astype(bool),
+    img = image[:2, :, :, :]
+    img_grey = (img[0, ...] * 0.2125) + (img[1, ...] * 0.7154)
+    binarized = np.where(img_grey > 0.03, 1, 0)
+    bin_opened = morphology.binary_opening(binarized.max(axis=0).astype(bool),
                                            selem=np.ones((8, 8)))
     processed = morphology.binary_dilation(bin_opened,
                                            selem=np.ones((10, 10),
                                                          dtype=int))
     clean_img = img * processed[np.newaxis, np.newaxis, :, :]
-    image_grey = color.rgb2gray(clean_img)
+    image_grey = (clean_img[0, ...] * 0.2125) + (clean_img[1, ...] * 0.7154)
     image_2um_blur = filters.gaussian(image_grey, sigma=0.5, mode = 'reflect',
                                       multichannel=True , preserve_range=True)
     thresh_value = filters.threshold_triangle(image_2um_blur.flatten())
@@ -177,7 +177,12 @@ def main():
 
     for f in range(1, nfield + 1):
         print(f'Processing field: {f}')
-        fposr, fposc = np.where(LAYOUT_25 == f) # Get field positions
+        # Get field positions
+        fposr, fposc = np.where(LAYOUT_25 == f)
+        rowstart = int((PLANE_SIZE[0] - OVERLAP_Y) * fposr)
+        colstart = int((PLANE_SIZE[1] - OVERLAP_X) * fposc)
+
+        # Create array for field
         orig_pixel_array = get_field_pixels(f,
                                             WELL_ROW,
                                             WELL_COLUMN,
@@ -186,11 +191,10 @@ def main():
 
         # Segment and insert into segment_con
         segmentation = segment_image(orig_pixel_array)
-        print(segmentation.shape)
+        segment_con[:, rowstart:rowstart+PLANE_SIZE[0], colstart:colstart+PLANE_SIZE[1]] = segmentation
 
         # Insert original into zarr_con
-        # rowstart = int((PLANE_SIZE[0] - OVERLAP_Y) * fposr)
-        # colstart = int((PLANE_SIZE[1] - OVERLAP_X) * fposc)
-        # zarr_con[:, :, rowstart:rowstart+PLANE_SIZE[0], colstart:colstart+PLANE_SIZE[1]] = orig_pixel_array
+        zarr_con[:, :, rowstart:rowstart+PLANE_SIZE[0], colstart:colstart+PLANE_SIZE[1]] = orig_pixel_array
+
 if __name__ == "__main__":
     main()
