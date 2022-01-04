@@ -118,7 +118,7 @@ def get_filename(row, col, field, plane, channel):
     return fn
 
 
-def get_field_pixels(field, row, col, nplane, nchannel, images_path):
+def get_field_pixels(field, row, col, nplane, nchannel, images_path, plane_size):
     images_path = Path(images_path)
     orig_pixels_array = np.zeros([nchannel, nplane, *plane_size])
     for ch in range(1, nchannel + 1):
@@ -193,7 +193,8 @@ def main(well_row, well_col, config_file):
                                             well_col,
                                             nplane,
                                             nchannel,
-                                            plate_path)
+                                            plate_path,
+                                            plane_size)
 
         # Segment and insert into segment_con
         segmentation = segment_image(orig_pixel_array)
@@ -205,7 +206,7 @@ def main(well_row, well_col, config_file):
 
     #label segments and save rois
     label_segment = measure.label(segment_con)
-    df =pd.DataFrame(measure.regionprops_table(label_segment, properties=('label','bbox', 
+    df = pd.DataFrame(measure.regionprops_table(label_segment, properties=('label','bbox', 
                                                                     'area','major_axis_length',
                                                                     'minor_axis_length'))).set_index('label')
     df.to_csv(Path(output_path) / f"r{well_row:02}c{well_col:02}organoids.csv")
@@ -219,8 +220,8 @@ if __name__ == "__main__":
     desc = ("Stitch all of the fields from the well of an Opera Phenix plate and"
             " output regions of interest.")
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument('-r', '--row', help='The row containing the well.')
-    parser.add_argument('-c', '--col', help='The column containing the well.')
+    parser.add_argument('-r', '--row', type=int, help='The row containing the well.')
+    parser.add_argument('-c', '--col', type=int, help='The column containing the well.')
     parser.add_argument('config_file', help='Path to the config file'
                                             ' (see documentation).')
     args = parser.parse_args()
