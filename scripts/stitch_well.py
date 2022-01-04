@@ -6,7 +6,8 @@ import numpy as np
 import xml.etree.ElementTree as ET
 from numcodecs import Blosc
 from pathlib import Path
-from skimage import io, morphology, filters
+from skimage import io, morphology, filters, measure
+import pandas as pd
 
 #global variable definition(all upper case variables)
 LAYOUT_25 = np.array([[ 2, 3, 4, 5, 6],
@@ -185,9 +186,20 @@ def main():
         # Segment and insert into segment_con
         segmentation = segment_image(orig_pixel_array)
         segment_con[:, rowstart:rowstart+PLANE_SIZE[0], colstart:colstart+PLANE_SIZE[1]] = segmentation
+        
 
         # Insert original into zarr_con
         zarr_con[:, :, rowstart:rowstart+PLANE_SIZE[0], colstart:colstart+PLANE_SIZE[1]] = orig_pixel_array
+
+    #label segments and save rois
+    label_segment = measure.label(segment_con)
+    df =pd.DataFrame(measure.regionprops_table(label_segment, properties=('label','bbox', 
+                                                                    'area','major_axis_length',
+                                                                    'minor_axis_length'))).set_index('label')
+    df.to_csv(f"r{WELL_ROW:02}c{WELL_COLUMN:02}organoids.csv")
+    
+
+
 
 # TODO: Detect organoids and write out as csv
 
