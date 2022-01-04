@@ -1,5 +1,7 @@
 #Create a stitched well from the original files and save as zarr
 # imports
+import argparse
+import configparser
 import re
 import zarr
 import numpy as np
@@ -15,12 +17,7 @@ LAYOUT_25 = np.array([[ 2, 3, 4, 5, 6],
                       [12,13, 1,14,15],
                       [20,19,18,17,16],
                       [21,22,23,24,25]])
-PLANE_SIZE = (1080, 1080)
-OVERLAP_X = 80
-OVERLAP_Y = 80
-WELL_ROW = 2
-WELL_COLUMN = 2
-PLATE_PATH = "/projects/liu-lab/ED_Lab_data/phenix_data_pk/pooja_96_gfp_mcherry_test11_10082021_20x_drug_d4_plate1__2021-10-08T13_09_49-Measurement 1/Images/"
+
 
 # function definitions
 def load_images(well,plate_path):
@@ -121,9 +118,9 @@ def get_filename(row, col, field, plane, channel):
     return fn
 
 
-def get_field_pixels(field, row, col, nplane, nchannel, images_path=PLATE_PATH):
+def get_field_pixels(field, row, col, nplane, nchannel, images_path=plate_path):
     images_path = Path(images_path)
-    orig_pixels_array = np.zeros([nchannel, nplane, *PLANE_SIZE])
+    orig_pixels_array = np.zeros([nchannel, nplane, *plane_size])
     for ch in range(1, nchannel + 1):
         for pl in range(1, nplane + 1):
             fn = get_filename(row, col, field, pl, ch)
@@ -150,53 +147,67 @@ def segment_image(image):
 
     return seg_image
 
+def parse_config(config_path):
+    parser = configparser.ConfigParser()
+    parser.read(config_path)
+    config_dict = parser['stitch_well']
+    plane_size_list = config_dict["plane_size"].strip('()').split(',')
+    plane_size = tuple([int(x) for x in plane_size_list])
+    return (plane_size,
+            int(config_dict["overlap_x"]),
+            int(config_dict["overlap_y"]),
+            config_dict["plate_path"],
+            config_dict["output_path"])
+
+
 # script 
-def main():
-    nfield, nplane, nchannel = parse_index_file(Path(PLATE_PATH) / 'Index.idx.xml',
-                                                well_col=WELL_COLUMN,
-                                                well_row=WELL_ROW)
+def main(well_row, well_col, config_file):
+    plane_size, overlap_x, overlap_y, plate_path, output_path = parse_config(config_file)
+    nfield, nplane, nchannel = parse_index_file(Path(plate_path) / 'Index.idx.xml',
+                                                well_col=well_col,
+                                                well_row=well_row)
     if nfield == 25:
         layout = LAYOUT_25
     else:
         raise ValueError(f'Wells with {nfield} fields are not supported') 
 
-    zarr_con, segment_con = generate_containers('test.zarr',
+    zarr_con, segment_con = generate_containers(Path(output_path) / f"r{well_row:02}c{well_col:02}.zarr",
                                                 layout,
                                                 nplane,
                                                 nchannel,
-                                                overlap=(OVERLAP_Y,
-                                                         OVERLAP_X),
-                                                plane_size=PLANE_SIZE)
+                                                overlap=(overlap_y,
+                                                         overlap_x),
+                                                plane_size=plane_size)
 
 
     for f in range(1, nfield + 1):
         print(f'Processing field: {f}')
         # Get field positions
         fposr, fposc = np.where(layout == f)
-        rowstart = int((PLANE_SIZE[0] - OVERLAP_Y) * fposr)
-        colstart = int((PLANE_SIZE[1] - OVERLAP_X) * fposc)
+        rowstart = int((plane_size[0] - overlap_y) * fposr)
+        colstart = int((plane_size[1] - overlap_x) * fposc)
 
         # Create array for field
         orig_pixel_array = get_field_pixels(f,
-                                            WELL_ROW,
-                                            WELL_COLUMN,
+                                            well_row,
+                                            well_col,
                                             nplane,
                                             nchannel)
 
         # Segment and insert into segment_con
         segmentation = segment_image(orig_pixel_array)
-        segment_con[:, rowstart:rowstart+PLANE_SIZE[0], colstart:colstart+PLANE_SIZE[1]] = segmentation
+        segment_con[:, rowstart:rowstart+plane_size[0], colstart:colstart+plane_size[1]] = segmentation
         
 
         # Insert original into zarr_con
-        zarr_con[:, :, rowstart:rowstart+PLANE_SIZE[0], colstart:colstart+PLANE_SIZE[1]] = orig_pixel_array
+        zarr_con[:, :, rowstart:rowstart+plane_size[0], colstart:colstart+plane_size[1]] = orig_pixel_array
 
     #label segments and save rois
     label_segment = measure.label(segment_con)
     df =pd.DataFrame(measure.regionprops_table(label_segment, properties=('label','bbox', 
                                                                     'area','major_axis_length',
                                                                     'minor_axis_length'))).set_index('label')
-    df.to_csv(f"r{WELL_ROW:02}c{WELL_COLUMN:02}organoids.csv")
+    df.to_csv(Path(output_path) / f"r{well_row:02}c{well_col:02}organoids.csv")
     
 
 
@@ -204,4 +215,12 @@ def main():
 # TODO: Detect organoids and write out as csv
 
 if __name__ == "__main__":
-    main()
+    desc = ("Stitch all of the fields from the well of an Opera Phenix plate and"
+            " output regions of interest.")
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument('-r', '--row', help='The row containing the well.')
+    parser.add_argument('-c', '--col', help='The column containing the well.')
+    parser.add_argument('config_file', help='Path to the config file'
+                                            ' (see documentation).')
+    args = parser.parse_args()
+    main(args.row, args.col, args.config_file)
