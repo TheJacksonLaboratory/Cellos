@@ -118,7 +118,7 @@ def get_filename(row, col, field, plane, channel):
     return fn
 
 
-def get_field_pixels(field, row, col, nplane, nchannel, images_path=plate_path):
+def get_field_pixels(field, row, col, nplane, nchannel, images_path):
     images_path = Path(images_path)
     orig_pixels_array = np.zeros([nchannel, nplane, *plane_size])
     for ch in range(1, nchannel + 1):
@@ -192,7 +192,8 @@ def main(well_row, well_col, config_file):
                                             well_row,
                                             well_col,
                                             nplane,
-                                            nchannel)
+                                            nchannel,
+                                            plate_path)
 
         # Segment and insert into segment_con
         segmentation = segment_image(orig_pixel_array)
