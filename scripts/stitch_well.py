@@ -20,10 +20,6 @@ LAYOUT_25 = np.array([[ 2, 3, 4, 5, 6],
 
 
 # function definitions
-def load_images(well,plate_path):
-    return True
-
-
 def parse_index_file(index_file_path, well_row, well_col):
     """Parse Index.idx.xml
 
@@ -34,7 +30,6 @@ def parse_index_file(index_file_path, well_row, well_col):
         nplane : number of planes per image
         nchannel : number of channels per image
     """
-
     indexp = Path(index_file_path)
     tree = ET.parse(indexp)
     root = tree.getroot()
@@ -91,7 +86,6 @@ def generate_containers(zarr_path, layout, nplane, nchannel, overlap, plane_size
         zarr_con : zarr.core.Array
         segment_con : np.array
     """
-
     row_overlap_sum = (layout.shape[0] - 1) * overlap[0]
     col_overlap_sum = (layout.shape[1] - 1) * overlap[1]
 
@@ -109,7 +103,6 @@ def generate_containers(zarr_path, layout, nplane, nchannel, overlap, plane_size
                            read_only=False)
 
     segment_con = np.zeros([nplane, row_shape, col_shape], dtype=np.bool8)
-
     return zarr_con, segment_con
 
 
@@ -126,6 +119,7 @@ def get_field_pixels(field, row, col, nplane, nchannel, images_path, plane_size)
             fn = get_filename(row, col, field, pl, ch)
             orig_pixels_array[ch - 1, pl - 1, ...] = io.imread(images_path / fn)
     return orig_pixels_array
+
 
 def segment_image(image):
     img = image[:2, :, :, :]
@@ -144,8 +138,8 @@ def segment_image(image):
     mask_triangle_2um = image_2um_blur > thresh_value
     seg_image = morphology.remove_small_objects(mask_triangle_2um,
                                                 min_size=8000)
-
     return seg_image
+
 
 def parse_config(config_path):
     parser = configparser.ConfigParser()
@@ -201,7 +195,6 @@ def main(well_row, well_col, config_file):
         # Segment and insert into segment_con
         segmentation = segment_image(orig_pixel_array)
         segment_con[:, rowstart:rowstart+plane_size[0], colstart:colstart+plane_size[1]] = segmentation
-        
 
         # Insert original into zarr_con
         zarr_con[:, :, rowstart:rowstart+plane_size[0], colstart:colstart+plane_size[1]] = orig_pixel_array
@@ -213,10 +206,6 @@ def main(well_row, well_col, config_file):
                                                                     'minor_axis_length'))).set_index('label')
     df.to_csv(Path(output_path) / f"r{well_row:02}c{well_col:02}organoids.csv")
     
-
-
-
-# TODO: Detect organoids and write out as csv
 
 if __name__ == "__main__":
     desc = ("Stitch all of the fields from the well of an Opera Phenix plate and"
