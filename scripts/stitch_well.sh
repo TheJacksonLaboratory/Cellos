@@ -4,7 +4,7 @@
 #SBATCH --job-name=stitch_well
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=6G
+#SBATCH --mem=12G
 #SBATCH --time=00:40:00
 
 usage="$(basename "$0") [-h] [-r row -c column -f configfile] -- \
