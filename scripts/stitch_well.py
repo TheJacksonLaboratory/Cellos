@@ -150,14 +150,16 @@ def segment_image(image):
 def parse_config(config_path):
     parser = configparser.ConfigParser()
     parser.read(config_path)
+    plate_path = parser['pipeline']['plate_path']
+    output_path = parser['pipeline']['output_path']
     config_dict = parser['stitch_well']
     plane_size_list = config_dict["plane_size"].strip('()').split(',')
     plane_size = tuple([int(x) for x in plane_size_list])
     return (plane_size,
             int(config_dict["overlap_x"]),
             int(config_dict["overlap_y"]),
-            config_dict["plate_path"],
-            config_dict["output_path"])
+            plate_path,
+            output_path)
 
 
 # script 
