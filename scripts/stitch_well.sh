@@ -8,7 +8,7 @@
 #SBATCH --time=00:40:00
 
 usage="$(basename "$0") [-h] [-r row -c column -f configfile] -- \
-Stitch all fields in an Opera Phenix well and find ROIs. Note that
+Stitch all fields in an Opera Phenix well and find ROIs. Note that \
 PYTHONPATH must be set in your environment to run the script.
 
 where:
