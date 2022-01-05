@@ -55,7 +55,7 @@ if [ ! -f "$configfile" ]; then
   exit 1
 fi
 
-if [ -z "PYTHONPATH" ]; then
+if [ -z "$PYTHONPATH" ]; then
   echo "ERROR: PYTHONPATH env variable must be set to run script"
   echo "$usage"
   exit 1
