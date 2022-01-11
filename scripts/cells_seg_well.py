@@ -8,8 +8,8 @@ from csbdeep.utils import normalize
 from skimage import measure
 import configparser
 import argparse
-#global variable definititon(all upper case variables)
 
+#global variable definititon(all upper case variables)
 STARDIST_PATH = '/projects/chuang-lab/mukasp/cell_seg_project/code/models'
 
 #function definitions
