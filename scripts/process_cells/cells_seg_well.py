@@ -9,9 +9,6 @@ from skimage import measure
 import configparser
 import argparse
 
-#global variable definititon(all upper case variables)
-STARDIST_PATH = '/projects/chuang-lab/mukasp/cell_seg_project/code/models'
-
 #function definitions
 def load_stardist(stardist_path):
     demo_model = False
@@ -27,16 +24,18 @@ def load_stardist(stardist_path):
 
     return model 
 
-def load_images(input_path,well_row,well_col,channel):
-    image = zarr.open(Path(input_path) / f"r{well_row:02}c{well_col:02}.zarr")
+def load_images_rois(input_path,well_row,well_col):
+    zimage = zarr.open(Path(input_path) / f"r{well_row:02}c{well_col:02}.zarr")
     rois = pd.read_csv(Path(input_path) / f"r{well_row:02}c{well_col:02}organoids.csv")
-    model = load_stardist(STARDIST_PATH) 
+    return zimage,rois
+
+def apply_stardist(stardist_path, zimage, rois, channel):
+    model = load_stardist(stardist_path) 
     cells =pd.DataFrame()
     for row in rois.itertuples():
-        organoid = image[:,row[2]:row[5],row[3]:row[6],row[4]:row[7]]
+        organoid = zimage[:,row[2]:row[5],row[3]:row[6],row[4]:row[7]]
         img = normalize(organoid, 1,99.8, axis= (0,1,2))
         labels, details = model.predict_instances(img[int(channel),:,:,:])
-        #labels_green, details_green = model.predict_instances(img[0,:,:,:])
         if labels.max() != 0:
             df = pd.DataFrame(measure.regionprops_table(labels, 
                                                         properties=('label','centroid', 
@@ -51,16 +50,19 @@ def parse_config(config_path):
     parser = configparser.ConfigParser()
     parser.read(config_path)
     input_path = parser['pipeline']['output_path']
-    output_path = parser['cells_seg_well']['cells_path']
+    output_path = parser['cells_seg_well']['output_path']
+    stardist_path = parser['cells_seg_well']['stardist_path']
     return (input_path,
-            output_path)
+            output_path,
+            stardist_path)
 
 
 #script 
 def main(well_row, well_col, config_file):
-    input_path, output_path = parse_config(config_file)
-    red_segmented_cells = load_images(input_path,well_row,well_col,0)
-    green_segmented_cells = load_images(input_path,well_row,well_col,1)
+    input_path, output_path, stardist_path = parse_config(config_file)
+    zimage,rois = load_images_rois(input_path,well_row,well_col)
+    red_segmented_cells = apply_stardist(stardist_path,zimage,rois,0 )
+    green_segmented_cells = apply_stardist(stardist_path,zimage,rois,1 )
     segmented_cells = pd.concat([red_segmented_cells,green_segmented_cells], axis=0)
     segmented_cells.to_csv(Path(output_path) / f"r{well_row:02}c{well_col:02}cells.csv")
   
