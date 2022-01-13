@@ -4,12 +4,13 @@
 #SBATCH --job-name=stitch_well
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=32G
+#SBATCH --mem=16G
 #SBATCH --time=00:40:00
 
 usage="$(basename "$0") [-h] [-r row -c column -f configfile] -- \
-Stitch all fields in an Opera Phenix well and find ROIs. Note that \
+Segment cells in each oganoid in a well. Note that \
 PYTHONPATH must be set in your environment to run the script.
+
 where:
     -h  show this help text
     -r  row coordinate of well
@@ -60,5 +61,4 @@ if [ -z "$PYTHONPATH" ]; then
   exit 1
 fi
 
-$PYTHONPATH stitch_well.py -r $row -c $column $configfile
-
+$PYTHONPATH cells_seg_well.py -r $row -c $column $configfile

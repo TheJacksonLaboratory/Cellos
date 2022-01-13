@@ -30,12 +30,11 @@ def load_stardist(stardist_path):
 def load_images(input_path,well_row,well_col,channel):
     image = zarr.open(Path(input_path) / f"r{well_row:02}c{well_col:02}.zarr")
     rois = pd.read_csv(Path(input_path) / f"r{well_row:02}c{well_col:02}organoids.csv")
-    axis_norm = (0,1,2)
     model = load_stardist(STARDIST_PATH) 
     cells =pd.DataFrame()
     for row in rois.itertuples():
         organoid = image[:,row[2]:row[5],row[3]:row[6],row[4]:row[7]]
-        img = normalize(organoid, 1,99.8, axis=axis_norm)
+        img = normalize(organoid, 1,99.8, axis= (0,1,2))
         labels, details = model.predict_instances(img[int(channel),:,:,:])
         #labels_green, details_green = model.predict_instances(img[0,:,:,:])
         if labels.max() != 0:
@@ -75,5 +74,4 @@ if __name__ == "__main__":
     parser.add_argument('config_file', help='Path to the config file'
                                             ' (see documentation).')
     args = parser.parse_args()
-    main(args.row, args.col, args.config_file)
-
+    main(args.row, args.col, args.config_file) 
