@@ -1,0 +1,6 @@
+zarr==2.10.1
+numpy==1.19.5
+scikit-image==0.16.2
+pandas==1.2.4
+stardist==0.6.0
+csbdeep==0.6.0
