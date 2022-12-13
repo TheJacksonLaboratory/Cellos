@@ -34,13 +34,19 @@ def apply_stardist(stardist_path, zimage, rois, channel):
     cells =pd.DataFrame()
     for row in rois.itertuples():
         organoid = zimage[:,row[2]:row[5],row[3]:row[6],row[4]:row[7]]
-        img = normalize(organoid, 1,99.8, axis= (0,1,2))
-        labels, details = model.predict_instances(img[int(channel),:,:,:])
+        image = normalize(organoid, 1,99.8, axis= (0,1,2))
+        labels, details = model.predict_instances(image[int(channel),:,:,:])
         if labels.max() != 0:
-            df = pd.DataFrame(measure.regionprops_table(labels, 
-                                                        properties=('label','centroid', 
-                                                                'area', 'major_axis_length',
-                                                                'minor_axis_length'))).set_index('label')
+            df = pd.DataFrame(measure.regionprops_table(labels,intensity_image=image,
+                                                        properties=("label","centroid","bbox", 
+                                                                "area", "axis_major_length",
+                                                                "axis_minor_length","area_bbox",
+                                                                "extent", "area_filled","area_convex", #"eccentricity"
+                                                                "euler_number","extent", # "feret_diameter_max",
+                                                                "intensity_max","intensity_mean","intensity_min",
+                                                                "inertia_tensor_eigvals", #"orientation", #"moments_weighted_hu",  "perimeter"
+                                                                "solidity"))).set_index('label')  #"perimeter_crofton"
+            df['organoids'] = row[1]
             df['organoids'] = row[1]
             df['fluor'] = channel
             cells = cells.append(df)
