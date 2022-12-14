@@ -8,6 +8,7 @@ from csbdeep.utils import normalize
 from skimage import measure
 import configparser
 import argparse
+import numpy as np
 
 #function definitions
 def load_stardist(stardist_path):
@@ -32,21 +33,31 @@ def load_images_rois(input_path,well_row,well_col):
 def apply_stardist(stardist_path, zimage, rois, channel):
     model = load_stardist(stardist_path) 
     cells =pd.DataFrame()
+
     for row in rois.itertuples():
-        organoid = zimage[:,row[2]:row[5],row[3]:row[6],row[4]:row[7]]
-        image = normalize(organoid, 1,99.8, axis= (0,1,2))
-        labels, details = model.predict_instances(image[int(channel),:,:,:])
-        if labels.max() != 0:
+        organoid = zimage[:,row[5]:row[8],row[6]:row[9],row[7]:row[10]]
+        img_org = organoid[int(channel),:,:,:]
+        img = normalize(img_org, 1,99.8, axis= (0,1,2))
+        labels, details = model.predict_instances(img)
+        labels = np.moveaxis(labels, 0, -1)
+        image = np.moveaxis(img_org, 0, -1)
+        if labels.max() !=0:
+            #uncomment to remove planar nuclei
+            # for i in range(1,np.max(labels)+1):
+            #     zmim=np.sum(np.max(1*(labels==i),axis=(0,1)))
+            #     #print(zmim)
+            #     if zmim<2:
+            #         planar_cells = planar_cells+1
+            #         labels[labels==i]=0
             df = pd.DataFrame(measure.regionprops_table(labels,intensity_image=image,
                                                         properties=("label","centroid","bbox", 
                                                                 "area", "axis_major_length",
                                                                 "axis_minor_length","area_bbox",
-                                                                "extent", "area_filled","area_convex",
+                                                                "extent", "area_filled","area_convex", 
                                                                 "euler_number","extent", 
                                                                 "intensity_max","intensity_mean","intensity_min",
                                                                 "inertia_tensor_eigvals", 
                                                                 "solidity"))).set_index('label') 
-            df['organoids'] = row[1]
             df['organoids'] = row[1]
             df['fluor'] = channel
             cells = cells.append(df)
