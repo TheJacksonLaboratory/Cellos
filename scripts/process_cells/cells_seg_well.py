@@ -41,11 +41,11 @@ def apply_stardist(stardist_path, zimage, rois, channel):
                                                         properties=("label","centroid","bbox", 
                                                                 "area", "axis_major_length",
                                                                 "axis_minor_length","area_bbox",
-                                                                "extent", "area_filled","area_convex", #"eccentricity"
-                                                                "euler_number","extent", # "feret_diameter_max",
+                                                                "extent", "area_filled","area_convex",
+                                                                "euler_number","extent", 
                                                                 "intensity_max","intensity_mean","intensity_min",
-                                                                "inertia_tensor_eigvals", #"orientation", #"moments_weighted_hu",  "perimeter"
-                                                                "solidity"))).set_index('label')  #"perimeter_crofton"
+                                                                "inertia_tensor_eigvals", 
+                                                                "solidity"))).set_index('label') 
             df['organoids'] = row[1]
             df['organoids'] = row[1]
             df['fluor'] = channel
