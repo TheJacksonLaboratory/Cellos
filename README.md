@@ -44,8 +44,8 @@ There are two main steps to run the pipeline: 1. Organanizing images and organoi
 
 > *Note*: you have to edit the config file to your needs. 
 >
-> |Parameter | Description | 
-> |------|------|
+> |Parameter |Description | 
+> |----------|-------------|
 > | plate_path   | path to where your raw images are | 
 > | output_path   | path to where the csv files and zarr arrays will be saved   | 
 > | well_targets   | rows and columns of wells to analyze  | 
