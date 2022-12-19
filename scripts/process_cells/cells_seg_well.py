@@ -83,7 +83,6 @@ def main(well_row, well_col, config_file):
     segmented_cells = pd.concat([red_segmented_cells,green_segmented_cells], axis=0)
     segmented_cells.to_csv(Path(output_path) / f"r{well_row:02}c{well_col:02}cells.csv")
   
-
 if __name__ == "__main__":
     desc = (" load zarr images and csv file of region of interest (organoids)"
             " output information about cells in each organoid.")
