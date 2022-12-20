@@ -7,7 +7,7 @@ matplotlib.use('pdf')
 
 #get a list of all masked(annotated) images, use images instead of mask to look at row images
 Y = []
-for filename in sorted(glob.glob('/projects/chuang-lab/mukasp/cell_seg_project/ChuangLab_organoids_analysis/docs/cellos_annotated_images/mask/*.tif')):
+for filename in sorted(glob.glob('~/ChuangLab_organoids_analysis/docs/cellos_annotated_images/mask/*.tif')):
     im=imageio.mimread(filename)
     imarray= np.array(im)
     Y.append(imarray)
