@@ -22,7 +22,7 @@ The pipeline uses conda environment, make sure you have anaconda (https://www.an
 + The steps for installing the pipeline:  
 
 	  git clone https://github.com/TheJacksonLaboratory/Cellos.git
-      cd ChuangLab_organoids_analysis #(make sure you are in the correct directory)
+      cd Cellos #(make sure you are in the correct directory)
 	  conda create -n organoid python=3.7.6
       conda activate organoid
       pip install -r requirements.txt
@@ -36,11 +36,18 @@ There are two main steps to run the pipeline: 1. Organanizing images and organoi
       PYTHONPATH=~/anaconda3.1/envs/organoid/bin/python bash stitch_well.sh -r (add row number here) -c (add column number here) -f ../../config.example.cfg (when you want to process one well)
 	  PYTHONPATH=~/anaconda3.1/envs/organoid/bin/python bash process_plate.sh -f ../../config.example.cfg (when you want to run multiple wells at the same time)
 
-+ The process for running organizing images and organoids segmentation steps: 
++ The process for running nuclei segmentation steps: 
 
       cd scripts/process_cells/
       PYTHONPATH=~/anaconda3.1/envs/organoid/bin/python bash cells_seg_well.sh -r (add row number here) -c (add column number here) -f ../../config.example.cfg (when you want to process one well)
 	  PYTHONPATH=~/anaconda3.1/envs/organoid/bin/python bash cells_process_plate.sh -f ../../config.example.cfg (when you want to run multiple wells at the same time)
+
+## Demo
+
+### Usage
+We have made an example dataset with one well data publicly available,
+the folder consists of images and .xml (metadata) file, and can be downloaded from: https://figshare.com/articles/dataset/cellos_data_zip/21992234 Once downloaded, it can be used as input example into the pipeline. The well row number=3 and column number=7. The image has 3 channels, channel1=EGFP, channel2=mCherry and channel3=brightfield.
+
 
 > *Note*: you have to edit the config file to your needs. 
 >
@@ -48,7 +55,7 @@ There are two main steps to run the pipeline: 1. Organanizing images and organoi
 > |-----|-------------|
 > | plate_path   | path to where your raw images are | 
 > | output_path   | path to where the csv files and zarr arrays will be saved   | 
-> | well_targets   | rows and columns of wells to analyze  | 
+> | well_targets   | name number of rows and columns (row1,col1&#124;row2,col2) of wells to analyze   | 
 > | plane_size   |  size of image of one field, one z-slice and one channel   | 
 > | overlap_x and y   | overlapping pixels between two adjacent fields   | 
 > | stardist_path   | path to the trained model for nuclei segmentation  | 

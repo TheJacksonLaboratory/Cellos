@@ -4,3 +4,6 @@ scikit-image==0.16.2
 pandas==1.2.4
 stardist==0.6.0
 csbdeep==0.6.0
+opencv-python ==4.5.1.48
+tifffile==2021.11.2
+imagecodecs==2021.8.26 
