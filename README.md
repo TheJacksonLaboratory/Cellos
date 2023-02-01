@@ -21,7 +21,7 @@ The pipeline uses conda environment, make sure you have anaconda (https://www.an
  
 + The steps for installing the pipeline:  
 
-	  git clone https://github.com/TheJacksonLaboratory/ChuangLab_organoids_analysis.git
+	  git clone https://github.com/TheJacksonLaboratory/Cellos.git
       cd ChuangLab_organoids_analysis #(make sure you are in the correct directory)
 	  conda create -n organoid python=3.7.6
       conda activate organoid
