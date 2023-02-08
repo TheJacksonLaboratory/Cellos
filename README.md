@@ -11,10 +11,10 @@
 
 ## Overview 
 
-***Cellos*** (Cell and Organoid Segmentation) is a pipeline developed to perform high-throughput volumetric 3D segmentation and morphological quantification of organoids and their cells. ***Cellos*** segments organoids using classical algorithms and segments nuclei using our trained Stardist-3D (https://github.com/stardist/stardist) model. 
+***Cellos*** (Cell and Organoid Segmentation) is a pipeline developed to perform high-throughput volumetric 3D segmentation and morphological quantification of organoids and their cells. ***Cellos*** segments organoids using classical algorithms and segments nuclei using our trained model based on Stardist-3D (https://github.com/stardist/stardist). 
 
 ## Data description
-The image data used here were exported from the Opera Phenix high content screening confocal microscope. The resulting folder contains subfolders with tiff files (Images) and xml files (metadata). Each tiff file was a single image from one well, one field, one x,y-plane and one channel. We developed an automatic protocol that organized all tiff files from same well and saved them as zarr arrays to minimize RAM and storage. All information about the images are deconvoluted from metadata file. 
+The image data used here were exported from the *PerkinElmer* Opera Phenix high content screening confocal microscope. The resulting folder contains subfolders with tiff files (Images) and xml files (metadata). Each tiff file was a single image from one well, one field, one plane and one channel. We developed an automatic protocol that organized all tiff files from same well and saved them as zarr arrays to minimize RAM and storage. All information about the images are deconvoluted from metadata file. 
 
 ## Installing the pipeline
 The pipeline uses conda environment, make sure you have anaconda (https://www.anaconda.com/products/distribution) before installing and running the pipeline. 
