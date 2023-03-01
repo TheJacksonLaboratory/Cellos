@@ -296,7 +296,7 @@ def main(well_row, well_col, config_file):
     df = pd.DataFrame(measure.regionprops_table(label_segment_order, intensity_image=image,
                                                             properties=("label","centroid","bbox", 
                                                                     "area", "major_axis_length",
-                                                                    "area_bbox",
+                                                                    "minor_axis_length","area_bbox",
                                                                     "extent", "area_filled","area_convex", 
                                                                     "euler_number","extent", 
                                                                     "intensity_max","intensity_mean","intensity_min",

@@ -25,7 +25,9 @@ The pipeline uses conda environment, make sure you have anaconda (https://www.an
       cd Cellos #(make sure you are in the correct directory)
 	  conda create -n organoid python=3.7.6
       conda activate organoid
+      conda install opencv
       pip install -r requirements.txt
+      conda install scikit-image
 
 ## Running the pipeline
 There are two main steps to run the pipeline: 1. Organanizing images and organoids segmentation. 2. Nuclei segmentation
@@ -38,6 +40,7 @@ There are two main steps to run the pipeline: 1. Organanizing images and organoi
 
 + The process for running nuclei segmentation steps: 
 
+      install tensorflow: pip install tensorflow
       cd scripts/process_cells/
       PYTHONPATH=~/anaconda3.1/envs/organoid/bin/python bash cells_seg_well.sh -r (add row number here) -c (add column number here) -f ../../config.example.cfg (when you want to process one well)
 	  PYTHONPATH=~/anaconda3.1/envs/organoid/bin/python bash cells_process_plate.sh -f ../../config.example.cfg (when you want to run multiple wells at the same time)
@@ -46,7 +49,7 @@ There are two main steps to run the pipeline: 1. Organanizing images and organoi
 
 ### Usage
 We have made an example dataset with one well data publicly available,
-the folder consists of images and .xml (metadata) file, and can be downloaded from: https://figshare.com/articles/dataset/cellos_data_zip/21992234 Once downloaded, it can be used as input example into the pipeline. The well row number=3 and column number=7. The image has 3 channels, channel1=EGFP, channel2=mCherry and channel3=brightfield.
+the folder consists of images and .xml (metadata) file, and can be downloaded from: https://figshare.com/articles/dataset/cellos_data_zip/21992234 Once downloaded, it can be used as input example into the pipeline. The well row number=3 and column number=7. The image has 3 channels, channel1=EGFP, channel2=mCherry and channel3=brightfield. The expected results are under output folder.
 
 
 > *Note*: you have to edit the config file to your needs. 

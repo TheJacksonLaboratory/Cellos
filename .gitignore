@@ -1,5 +1,3 @@
 Index.idx.xml
 *.zarr
 __pycache__
-*.csv
-*.pdf

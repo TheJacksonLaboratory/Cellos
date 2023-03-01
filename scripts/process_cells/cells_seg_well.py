@@ -33,7 +33,7 @@ def load_images_rois(input_path,well_row,well_col):
 def apply_stardist(stardist_path, zimage, rois, channel):
     model = load_stardist(stardist_path) 
     cells =pd.DataFrame()
-
+    planar_cells = 0
     for row in rois.itertuples():
         organoid = zimage[:,row[5]:row[8],row[6]:row[9],row[7]:row[10]]
         img_org = organoid[int(channel),:,:,:]
@@ -42,17 +42,16 @@ def apply_stardist(stardist_path, zimage, rois, channel):
         labels = np.moveaxis(labels, 0, -1)
         image = np.moveaxis(img_org, 0, -1)
         if labels.max() !=0:
-            #uncomment to remove planar nuclei
-            # for i in range(1,np.max(labels)+1):
-            #     zmim=np.sum(np.max(1*(labels==i),axis=(0,1)))
-            #     #print(zmim)
-            #     if zmim<2:
-            #         planar_cells = planar_cells+1
-            #         labels[labels==i]=0
+            #comment to keep planar nuclei
+            for i in range(1,np.max(labels)+1):
+                zmim=np.sum(np.max(1*(labels==i),axis=(0,1)))
+                if zmim<2:
+                    planar_cells = planar_cells+1
+                    labels[labels==i]=0
             df = pd.DataFrame(measure.regionprops_table(labels,intensity_image=image,
                                                         properties=("label","centroid","bbox", 
-                                                                "area", "axis_major_length",
-                                                                "axis_minor_length","area_bbox",
+                                                                "area", "major_axis_length",
+                                                                "minor_axis_length","area_bbox",
                                                                 "extent", "area_filled","area_convex", 
                                                                 "euler_number","extent", 
                                                                 "intensity_max","intensity_mean","intensity_min",
@@ -72,7 +71,6 @@ def parse_config(config_path):
     return (input_path,
             output_path,
             stardist_path)
-
 
 #script 
 def main(well_row, well_col, config_file):
