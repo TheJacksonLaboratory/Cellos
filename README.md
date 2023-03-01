@@ -65,5 +65,5 @@ the folder consists of images and .xml (metadata) file, and can be downloaded fr
 > | ...  | ...  | 
 
 
-> ***Tip***: All of the steps implemented in our pipeline are optimized to run on high-performance computer (HPC) systems to take advantage of parallel processing and to carry out the steps that computationally intensive. The most expensive step in the pipeline is to process the whole image in the steps to organize the image and segment organoids. To minimize this, if not needed, you can remove the step to calculate area of image that has organoids and to plot raw images. 
+> ***Tip***: All of the steps implemented in our pipeline are optimized to run on high-performance computer (HPC) systems to take advantage of parallel processing and to carry out the steps that computationally intensive. The most expensive step in the pipeline is to process the whole image in the steps to organize the image and segment organoids. To minimize this, if not needed, you can remove the step to calculate area of image that has organoids and to plot raw images. To run organoids segmentation step on demo data we used a wall-clock time of approximately 2 hours and 30 min on an HPC system using 1 core and 32 GB of memory and to run nuclei segmentation step we used a wall-clock time of approximately 25 min on HPC system using 4 cores and less than 5 GB of memory. 
 
