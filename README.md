@@ -1,7 +1,7 @@
 # ***Cellos***: High-throughput deconvolution of 3D organoid dynamics at cellular resolution for cancer pharmacology 
 
 <p>
-    <img src="docs/pipeline.png" width="1000"/>
+    <img src="docs/pipeline3d.png" width="1000"/>
 </p>
 
 - [Overview](#overview)
