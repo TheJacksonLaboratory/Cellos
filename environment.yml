@@ -1,4 +1,4 @@
-name: organoids
+name: organoid
 channels:
   - conda-forge
   - nodefaults
