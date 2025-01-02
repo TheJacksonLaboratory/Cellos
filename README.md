@@ -30,12 +30,15 @@ conda create -f environment.yml
 
 This will use `conda` to create a Python 3.7 environment and then install all packages from PyPI using `pip` and the `requirements.txt` file.
 
-If you prefer to install the pipeline dependencies into a pre-existing environment (e.g. `venv`), you can use:
+If you prefer to install the pipeline dependencies into a pre-existing Python 3.7 environment (e.g. `venv`), you can use:
 
 ```bash
 pip install --require-hashes --no-deps -r requirements.txt
 ```
 This will ensure you install the exact packages that we've tested.
+
+> [!NOTE]
+> At present we've tested the pipeline only on Centos 7 and Rocky 9 Linux and using Python 3.7.
 
 
 ## Running the pipeline
