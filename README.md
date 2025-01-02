@@ -18,7 +18,7 @@ The image data used here were exported from the *PerkinElmer* Opera Phenix high 
 
 ## Installing the pipeline
 Currently, the pipeline uses a Python 3.7 environment. We provide a defined `requirements.txt` to install all packages and dependencies for a working environment on Rocky 9 Linux.  
-We recommend creating a virtual environment for running the pipeline, for example using `conda`.
+We recommend creating a virtual environment for running the pipeline, for example using [`conda`](https://conda-forge.org/download/).
  
 Installing the pipeline using `conda` to manage the Python version:  
 
