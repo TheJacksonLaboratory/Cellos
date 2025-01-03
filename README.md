@@ -132,14 +132,28 @@ overlap_y   | overlapping pixels between two adjacent fields   |
 
 ## Usage
 
-We have made an example dataset with one well data publicly available,
-The folder consists of images and .xml (metadata) file, and can be downloaded from: https://figshare.com/articles/dataset/cellos_data_zip/21992234  
+We have made an example dataset with one well data publicly available. The well row number=3 and column number=7. The image has 3 channels, channel1=EGFP, channel2=mCherry and channel3=brightfield. 
 
-> [!NOTE]
-> This is a ~11Gb zip file. On Linux, it needs to be unziped using [7z](https://www.7-zip.org).
+It can be downloaded from: https://figshare.com/articles/dataset/cellos_data_zip/21992234  
 
-The well row number=3 and column number=7. The image has 3 channels, channel1=EGFP, channel2=mCherry and channel3=brightfield. 
-To use the provided `config.example.cfg` and script commands from above, we recommend you unzip the file into a folder called `cellos_data` in the root of this repository.
+On Linux, you can download it as follows:
+
+```bash
+wget https://figshare.com/ndownloader/files/39032216
+```
+
+> [!WARNING]
+> This is a ~11Gb zip file. 
+
+On Linux, it needs to be unziped using [7z](https://www.7-zip.org):
+
+```bash
+7z x 39032216
+```
+
+This will extract a `cellos_data` folder consisting of images (`.tiff`) and `Index.idx.xml` (metadata) file.
+
+To use the provided `config.example.cfg` and script commands from above, we recommend you place the `cellos_data` in the root of this repository.
 
 You should obtain the following layout for the `Cellos` directory, where `...` indicates abridged files:
 
