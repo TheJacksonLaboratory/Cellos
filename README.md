@@ -38,11 +38,22 @@ pip install --require-hashes --no-deps -r requirements.txt
 This will ensure you install the exact packages that we've tested.
 
 > [!NOTE]
-> At present we've tested the pipeline only on Centos 7 and Rocky 9 Linux and using Python 3.7.
-
+> - At present we've tested the pipeline only on Centos 7 and Rocky 9 Linux and using Python 3.7.
+> - The provided environment does not include additional packages required for specific GPU support, e.g. CUDA.
 
 ## Running the pipeline
-There are two main steps to run the pipeline: 1. Organanizing images and organoids segmentation. 2. Nuclei segmentation
+
+There are two main steps to run the pipeline: 
+1. Organanizing images and organoids segmentation. 
+2. Nuclei segmentation
+
+Each of these can be run on an individual well using a plain `bash` script or as an `sbatch` script. To run on a whole plate, the script uses `sbatch` to launch jobs on a SLURM HPC cluster. The `sbatch` settings have been optimized using the sample data set and the JAX Sumner2 cluster.
+
+> [!IMPORTANT]
+> If you are running this pipeline on Sumner2, be aware that the scheduler is merciless and will kill your job if it exceeds the requested memory.  
+> The two `sbatch` scripts, `scripts/process_organoids/stitch_well.sh` and `scripts/process_cells/cells_seg_well.sh`, have ~25% memory headroom, based on the sample data, but if your jobs are killed you will want to edit them to increase the requested memory.
+
+### The process for running organizing images and organoids segmentation steps
 
 > [!IMPORTANT]
 > If you are using a virtual environment, ensure you have it activated!  
@@ -50,19 +61,51 @@ There are two main steps to run the pipeline: 1. Organanizing images and organoi
 > ```bash
 > conda activate organoid
 > ```
+> Otherwise, provice the path to your Python 3.7 interpreter in the `PYTHONPATH` variable.
+> You may also need to ensure the scripts are executable using:
+> ```bash
+> chmod u+x <script name>
+> ```
 
-+ The process for running organizing images and organoids segmentation steps: 
+- For a single well--this takes ~2 hours wall-time and uses ~128G of memory.  
+  From an interactive session, using `bash`:
+    ```bash
+    cd scripts/process_organoids/
+    PYTHONPATH=$(which python) bash stitch_well.sh -r <row number> -c <column number> -f ../../config.example.cfg
+    ```
+  As a SLURM job using `sbatch` (requests: 2 cores, 160G memory):
+    ```bash
+    cd scripts/process_organoids/
+    PYTHONPATH=$(which python) sbatch stitch_well.sh -r <row number> -c <column number> -f ../../config.example.cfg
+    ```
 
-      cd scripts/process_organoids/
-      PYTHONPATH=~/anaconda3.1/envs/organoid/bin/python bash stitch_well.sh -r (add row number here) -c (add column number here) -f ../../config.example.cfg (when you want to process one well)
-	  PYTHONPATH=~/anaconda3.1/envs/organoid/bin/python bash process_plate.sh -f ../../config.example.cfg (when you want to run multiple wells at the same time)
+- For a whole plate--this submits a series of the above as SLURM jobs using `sbatch`:
+    ```bash
+    cd scripts/process_organoids/
+    PYTHONPATH=$(which python) bash process_plate.sh -f ../../config.example.cfg 
+    ```
 
-+ The process for running nuclei segmentation steps: 
+### The process for running nuclei segmentation steps: 
 
-      install tensorflow: pip install tensorflow
-      cd scripts/process_cells/
-      PYTHONPATH=~/anaconda3.1/envs/organoid/bin/python bash cells_seg_well.sh -r (add row number here) -c (add column number here) -f ../../config.example.cfg (when you want to process one well)
-	  PYTHONPATH=~/anaconda3.1/envs/organoid/bin/python bash cells_process_plate.sh -f ../../config.example.cfg (when you want to run multiple wells at the same time)
+- For a single well--this takes <20 min wall-time with 8 cores and uses ~6G of memory.  
+  From an interactive session, using `bash`:
+    ```bash
+    cd scripts/process_cells/
+    PYTHONPATH=$(which python) bash cells_seg_well.sh -r <row number> -c <column number> -f ../../config.example.cfg
+    ```
+  As a SLURM job using `sbatch` (requests: 8 cores, 10G of memory):
+    ```bash
+    cd scripts/process_cells/
+    PYTHONPATH=$(which python) sbatch cells_seg_well.sh -r <row number> -c <column number> -f ../../config.example.cfg
+    ```
+
+  For a whole plate--this submits a series of the above as SLURM jobs using `sbatch`:    
+    ```bash
+    PYTHONPATH=$(which python) bash cells_process_plate.sh -f ../../config.example.cfg
+    ```
+
+> [!NOTE]
+> All of the above commands are using `../../config.example.cfg` as the location of the config file, because of the layout of this repository. You can provide an **absolute path** to another location.
 
 ## Demo
 
