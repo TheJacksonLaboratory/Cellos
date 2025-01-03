@@ -107,25 +107,126 @@ Each of these can be run on an individual well using a plain `bash` script or as
 > [!NOTE]
 > All of the above commands are using `../../config.example.cfg` as the location of the config file, because of the layout of this repository. You can provide an **absolute path** to another location.
 
-## Demo
+### The configuration file
 
-### Usage
-We have made an example dataset with one well data publicly available,
-the folder consists of images and .xml (metadata) file, and can be downloaded from: https://figshare.com/articles/dataset/cellos_data_zip/21992234 Once downloaded, it can be used as input example into the pipeline. The well row number=3 and column number=7. The image has 3 channels, channel1=EGFP, channel2=mCherry and channel3=brightfield. The expected results are under output folder.
+The pipeline requires certain key parameters to be provided. For this we use a simple INI style plain-text file that can be parsed with the [`configparser` module](https://docs.python.org/3/library/configparser.html).  
+In the repository we provide an example configuration file, `config.example.cfg`. 
+
+| Parameter | Description | 
+|-----|-------------|
+| `[pipeline]` | |
+| plate_path   | path to where your raw images are | 
+| output_path   | path to where the csv files and zarr arrays will be saved   | 
+| well_targets   | name number of rows and columns (row1,col1&#124;row2,col2) of wells to analyze   | 
+| `[stitch_well]` | |
+| plane_size   |  size of image of one field, one z-slice and one channel   | 
+| overlap_x  | overlapping pixels between two adjacent fields   |
+overlap_y   | overlapping pixels between two adjacent fields   | 
+| `[cells_seg_well]` | |
+| output_path   | path to where the csv files will be saved   | 
+| stardist_path   | path to the trained model for nuclei segmentation  | 
 
 
-> *Note*: you have to edit the config file to your needs. 
->
-> | Parameter | Description | 
-> |-----|-------------|
-> | plate_path   | path to where your raw images are | 
-> | output_path   | path to where the csv files and zarr arrays will be saved   | 
-> | well_targets   | name number of rows and columns (row1,col1&#124;row2,col2) of wells to analyze   | 
-> | plane_size   |  size of image of one field, one z-slice and one channel   | 
-> | overlap_x and y   | overlapping pixels between two adjacent fields   | 
-> | stardist_path   | path to the trained model for nuclei segmentation  | 
-> | ...  | ...  | 
+> [!NOTE]
+> The paths can be *relative* to the scripts, as is in the example provided here, which assumes the layout of the repository is fixed. Otherwise, the paths should be provided as **absolute paths**.
 
+## Usage
 
-> ***Tip***: All of the steps implemented in our pipeline are optimized to run on high-performance computer (HPC) systems to take advantage of parallel processing and to carry out the steps that are computationally intensive. The most expensive step in the pipeline is to process the whole image in the steps to organize the image and segment organoids. To minimize this, if not needed, you can remove the step to calculate area of image that has organoids and to plot raw images. To run organoids segmentation step on demo data we used a wall-clock time of approximately 2 hours and 30 min on an HPC system using 1 core and 32 GB of memory and to run nuclei segmentation step we used a wall-clock time of approximately 25 min on HPC system using 4 cores and less than 5 GB of memory. 
+We have made an example dataset with one well data publicly available. The well row number=3 and column number=7. The image has 3 channels, channel1=EGFP, channel2=mCherry and channel3=brightfield. 
 
+It can be downloaded from: https://figshare.com/articles/dataset/cellos_data_zip/21992234  
+
+On Linux, you can download it as follows:
+
+```bash
+wget https://figshare.com/ndownloader/files/39032216
+```
+
+> [!WARNING]
+> This is a ~11Gb zip file. 
+
+On Linux, it needs to be unziped using [7z](https://www.7-zip.org):
+
+```bash
+7z x 39032216
+```
+
+This will extract a `cellos_data` folder consisting of images (`.tiff`) and `Index.idx.xml` (metadata) file.
+
+To use the provided `config.example.cfg` and script commands from above, we recommend you place the `cellos_data` in the root of this repository.
+
+You should obtain the following layout for the `Cellos` directory, where `...` indicates abridged files:
+
+```
+├── config.example.cfg
+├ ...
+├── cellos_data
+│   └── Index.idx.xml
+|   └── r03c07 ... .tiff
+├── models
+│   └── stardist
+│       ├ ...
+├── output
+│   ├ ...
+└── scripts
+    ├── process_cells
+    │   ├── cells_process_plate.sh
+    │   ├── cells_seg_well.py
+    │   └── cells_seg_well.sh
+    └── process_organoids
+        ├── process_plate.sh
+        ├── stitch_well.py
+        └── stitch_well.sh
+```
+
+> [!IMPORTANT]
+> We provide the expected results for running the pipeline on the sample data in the `output` folder in the root of the repository.
+> If you plan on running the pipeline on the sample data, we recommend you backup or rename this folder such that you can compare your results with ours.
+> Alternately, you can change the `output_path` paramters in the `.cfg` file.
+
+Assuming the above layout, you can use the provided `config.example.cfg` and run the pipeline in two steps:
+
+> [!IMPORTANT]
+> - If you are using an interactive session, ensure you have enough memory!
+> - Ensure you have activated your virtual environment, e.g:
+> ```bash
+> conda activate organoid
+> ```
+
+1. Organize images and segment organoids (this takes ~2 hours using the `sbatch` script)  
+  From the Cellos directory (root of the repository) `cd` into the proper scripts directory:
+
+    ```bash
+    cd scripts/process_organoids
+    ```
+    
+    Run the first step using `bash` (an interactive session):
+    
+    ```bash
+    PYTHONPATH=$(which python) bash stitch_well.sh -r 3 -c 7 -f ../../config.example.cfg
+    ```
+  
+    Alternately, run the first step as a SLURM job using `sbatch` (requests: 2 cores, 160G memory):
+  
+    ```bash
+    PYTHONPATH=$(which python) sbatch stitch_well.sh -r 3 -c 7 -f ../../config.example.cfg
+    ```
+    
+2. Segment cells (this takes <20 min using the `sbatch` script)  
+  From the Cellos directory (root of the repository) `cd` into the proper scripts directory:
+
+    ```bash
+    cd scripts/process_cells
+    ```
+
+    Run the second step using `bash` (an interactive session): 
+  
+    ```bash
+    PYTHONPATH=$(which python) bash cells_seg_well.sh -r 3 -c 7 -f ../../config.example.cfg
+    ```
+  
+    Alternately, run the second step as a SLURM job using `sbatch` (requests: 8 cores, 10G of memory):
+  
+    ```bash
+    PYTHONPATH=$(which python) sbatch cells_seg_well.sh -r 3 -c 7 -f ../../config.example.cfg
+    ```
