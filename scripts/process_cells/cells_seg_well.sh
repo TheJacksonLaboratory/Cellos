@@ -1,11 +1,13 @@
 #!/bin/bash
 #SBATCH --qos=batch
 #SBATCH --partition=compute
-#SBATCH --job-name=stitch_well
+#SBATCH --job-name=cells_seg_well
+#SBATCH -o cells_seg_well.out
+#SBATCH -e cells_seg_well.err
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=16G
-#SBATCH --time=00:40:00
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=10G
+#SBATCH --time=00:30:00
 
 usage="$(basename "$0") [-h] [-r row -c column -f configfile] -- \
 Segment cells in each oganoid in a well. Note that \

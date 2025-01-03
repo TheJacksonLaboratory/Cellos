@@ -2,10 +2,12 @@
 #SBATCH --qos=batch
 #SBATCH --partition=compute
 #SBATCH --job-name=stitch_well
+#SBATCH -o stitch_well.out
+#SBATCH -e stitch_well.err
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=32G
-#SBATCH --time=00:40:00
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=160G
+#SBATCH --time=03:00:00
 
 usage="$(basename "$0") [-h] [-r row -c column -f configfile] -- \
 Stitch all fields in an Opera Phenix well and find ROIs. Note that \
