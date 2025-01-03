@@ -1,3 +1,9 @@
 Index.idx.xml
 *.zarr
 __pycache__
+39032216
+cellos_data
+scripts/process_cells/*.out
+scripts/process_cells/*.err
+scripts/process_organoids/*.out
+scripts/process_organoids/*.err
