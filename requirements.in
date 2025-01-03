@@ -1,0 +1,10 @@
+zarr==2.10.1
+numpy==1.21.6
+pandas==1.2.4
+stardist
+csbdeep
+tifffile==2021.11.2
+imagecodecs==2021.8.26
+opencv_python==4.5.1.48
+scikit_image==0.19.3
+tensorflow
