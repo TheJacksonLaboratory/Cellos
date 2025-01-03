@@ -71,15 +71,15 @@ Each of these can be run on an individual well using a plain `bash` script or as
   From an interactive session, using `bash`:
     ```bash
     cd scripts/process_organoids/
-    PYTHONPATH=$(which python) bash stitch_well.sh -r (add row number here) -c (add column number here) -f ../../config.example.cfg
+    PYTHONPATH=$(which python) bash stitch_well.sh -r <row number> -c <column number> -f ../../config.example.cfg
     ```
-  As a SLURM job using `sbatch`:
+  As a SLURM job using `sbatch` (requests: 2 cores, 160G memory):
     ```bash
     cd scripts/process_organoids/
-    PYTHONPATH=$(which python) sbatch stitch_well.sh -r (add row number here) -c (add column number here) -f ../../config.example.cfg
+    PYTHONPATH=$(which python) sbatch stitch_well.sh -r <row number> -c <column number> -f ../../config.example.cfg
     ```
 
-- For a whole plate--this sumbits a series of SLURM jobs using `sbatch`:
+- For a whole plate--this submits a series of the above as SLURM jobs using `sbatch`:
     ```bash
     cd scripts/process_organoids/
     PYTHONPATH=$(which python) bash process_plate.sh -f ../../config.example.cfg 
@@ -91,18 +91,21 @@ Each of these can be run on an individual well using a plain `bash` script or as
   From an interactive session, using `bash`:
     ```bash
     cd scripts/process_cells/
-    PYTHONPATH=$(which python) bash cells_seg_well.sh -r (add row number here) -c (add column number here) -f ../../config.example.cfg
+    PYTHONPATH=$(which python) bash cells_seg_well.sh -r <row number> -c <column number> -f ../../config.example.cfg
     ```
-  As a SLURM job using `sbatch`:
+  As a SLURM job using `sbatch` (requests: 8 cores, 10G of memory):
     ```bash
     cd scripts/process_cells/
-    PYTHONPATH=$(which python) sbatch cells_seg_well.sh -r (add row number here) -c (add column number here) -f ../../config.example.cfg
+    PYTHONPATH=$(which python) sbatch cells_seg_well.sh -r <row number> -c <column number> -f ../../config.example.cfg
     ```
 
-  For a whole plate--this sumbits a series of SLURM jobs using `sbatch`:    
+  For a whole plate--this submits a series of the above as SLURM jobs using `sbatch`:    
     ```bash
     PYTHONPATH=$(which python) bash cells_process_plate.sh -f ../../config.example.cfg
     ```
+
+> [!NOTE]
+> All of the above commands are using `../../config.example.cfg` as the location of the config file, because of the layout of this repository. You can provide an **absolute path** to another location.
 
 ## Demo
 
