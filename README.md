@@ -17,20 +17,39 @@
 The image data used here were exported from the *PerkinElmer* Opera Phenix high content screening confocal microscope. The resulting folder contains subfolders with tiff files (Images) and xml files (metadata). Each tiff file was a single image from one well, one field, one plane and one channel. We developed an automatic protocol that organized all tiff files from same well and saved them as zarr arrays to minimize RAM and storage. All information for the images are deconvoluted from the respective metadata files. 
 
 ## Installing the pipeline
-The pipeline uses conda environment, make sure you have anaconda (https://www.anaconda.com/products/distribution) before installing and running the pipeline. 
+Currently, the pipeline uses a Python 3.7 environment. We provide a defined `requirements.txt` to install all packages and dependencies for a working environment on Rocky 9 Linux.  
+We recommend creating a virtual environment for running the pipeline, for example using [`conda`](https://conda-forge.org/download/).
  
-+ The steps for installing the pipeline:  
+Installing the pipeline using `conda` to manage the Python version:  
 
-	  git clone https://github.com/TheJacksonLaboratory/Cellos.git
-      cd Cellos #(make sure you are in the correct directory)
-	  conda create -n organoid python=3.7.6
-      conda activate organoid
-      conda install opencv
-      pip install -r requirements.txt
-      conda install scikit-image
+```bash
+git clone https://github.com/TheJacksonLaboratory/Cellos.git
+cd Cellos #(make sure you are in the correct directory)
+conda create -f environment.yml
+```
+
+This will use `conda` to create a Python 3.7 environment and then install all packages from PyPI using `pip` and the `requirements.txt` file.
+
+If you prefer to install the pipeline dependencies into a pre-existing Python 3.7 environment (e.g. `venv`), you can use:
+
+```bash
+pip install --require-hashes --no-deps -r requirements.txt
+```
+This will ensure you install the exact packages that we've tested.
+
+> [!NOTE]
+> At present we've tested the pipeline only on Centos 7 and Rocky 9 Linux and using Python 3.7.
+
 
 ## Running the pipeline
 There are two main steps to run the pipeline: 1. Organanizing images and organoids segmentation. 2. Nuclei segmentation
+
+> [!IMPORTANT]
+> If you are using a virtual environment, ensure you have it activated!  
+> For example, using `conda` as recommended, do:
+> ```bash
+> conda activate organoid
+> ```
 
 + The process for running organizing images and organoids segmentation steps: 
 
