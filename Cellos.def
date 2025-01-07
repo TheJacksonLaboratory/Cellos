@@ -1,0 +1,11 @@
+Bootstrap: docker
+From: python:3.7-slim-bookworm
+
+%files
+    requirements.txt /requirements.txt
+
+%post
+    pip install --require-hashes --no-deps -r /requirements.txt
+
+%environment
+    export PYTHONPATH=/usr/local/bin/python
