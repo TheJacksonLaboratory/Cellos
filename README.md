@@ -25,7 +25,7 @@ Installing the pipeline using `conda` to manage the Python version:
 ```bash
 git clone https://github.com/TheJacksonLaboratory/Cellos.git
 cd Cellos #(make sure you are in the correct directory)
-conda anv create -f environment.yml
+conda env create -f environment.yml
 ```
 
 This will use `conda` to create a Python 3.7 environment and then install all packages from PyPI using `pip` and the `requirements.txt` file.
