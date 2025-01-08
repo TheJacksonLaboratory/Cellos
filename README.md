@@ -48,21 +48,23 @@ This will ensure you install the exact packages that we've tested.
 > - At present we've tested the pipeline only on Centos 7 and Rocky 9 Linux and using Python 3.7.
 > - The provided environment does not include additional packages required for specific GPU support, e.g. CUDA.
 
-### Build and use a Docker or Apptainer/Singularity container
+### Build and use Apptainer/Singularity container
 
-We provide a `Dockerfile` and an Apptainer `.def` file (`Cellos.def`) to build a Docker or Apptainer/Singularity container.
-
-To build a Docker container, you can use the provided `Dockerfile` after cloning the repository:
-
-```bash
-docker build -t cellos .
-```
-
-To build an Apptainer/Singularity container, you can use the provided `.def` file (either clone the repository or wget/curl the `.def` file):
+To build an Apptainer/Singularity container, you can use the provided `Cellos.def` file (either clone the repository or wget/curl the `.def` file):
 
 ```bash
 apptainer build cellos.sif Cellos.def
 ```
+
+> [!NOTE]
+> As a convenience, we also provide a `Dockerfile`, however this has not been extensively tested and is not supported in our computing environment, so we cannot offer any support or universal advice on using it.
+> 
+> To build the Docker container, you can use the provided `Dockerfile` after cloning the repository:
+> 
+> ```bash
+> docker build -t cellos .
+> ```
+
 
 #### Building the Apptainer/Singularity container on Sumner2
 
@@ -126,7 +128,7 @@ Each of these can be run on an individual well using a plain `bash` script or as
 > ```
 > Otherwise, provide the path to your Python 3.7 interpreter in the `PYTHONPATH` variable.
 >  
-> **If you are using the containerized Python interpreter, set the `PYTHONPATH` to the path of the container.**  
+> **If you are using the Apptainer/Singularity container for the Python interpreter, then set the `PYTHONPATH` to the path of the build container `cellos.sif`.**  
 >
 > You may also need to ensure the scripts are executable using:
 > ```bash
