@@ -76,7 +76,11 @@ You can access it from a login node by using:
 ```bash
 sinteractive -p build -q build
 ```
-Load the needed singularity/apptainer module (note that `singularity` can be used interchangeably with the new name `apptainer`):
+
+> [!TIP]
+>  `singularity` and `apptainer` can be used interchangeably in all of these commands.
+
+Load the needed singularity/apptainer module:
 ```
 module load singularity
 ```
