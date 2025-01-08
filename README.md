@@ -101,10 +101,11 @@ singularity build Cellos.sif Cellos.def
 Once you see `INFO:    Build complete: Cellos.sif` you can end the session using `exit`.
 
 > [!TIP]
-> You can now add this container to your `PATH` variable to ensure you can use it from other (sub)directories. Ensure you are in the same directory as the `Cellos.sif` file and run:
+> You can now add the directory enclosing the container to your `PATH` variable to ensure you can use it from other (sub)directories. Ensure you are in the same directory as the `Cellos.sif` file and run:
 > ```
 > export PATH=$PATH:$(pwd)
 > ```
+> Alternatively, you can copy/build the `Cellos.sif` container to a directory already in your `PATH`, e.g. a `/bin` directory in your home directory.
 
 ## Running the pipeline
 
