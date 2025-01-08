@@ -124,8 +124,10 @@ Each of these can be run on an individual well using a plain `bash` script or as
 > ```bash
 > conda activate organoid
 > ```
-> Otherwise, provide the path to your Python 3.7 interpreter in the `PYTHONPATH` variable.  
-> If you are using the containerized Python interpreter, set the `PYTHONPATH` to the path of the container.  
+> Otherwise, provide the path to your Python 3.7 interpreter in the `PYTHONPATH` variable.
+>  
+> **If you are using the containerized Python interpreter, set the `PYTHONPATH` to the path of the container.**  
+>
 > You may also need to ensure the scripts are executable using:
 > ```bash
 > chmod u+x <script name>
