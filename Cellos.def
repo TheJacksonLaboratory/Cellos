@@ -9,3 +9,6 @@ From: python:3.7-slim-bookworm
 
 %environment
     export PYTHONPATH=/usr/local/bin/python
+
+%runscript
+    exec python "$@"
