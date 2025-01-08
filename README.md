@@ -20,7 +20,7 @@ The image data used here were exported from the *PerkinElmer* Opera Phenix high 
 
 We provide two ways to install the pipeline:
 1. Install into a Python 3.7 environment using `conda` or `pip`
-2. Build and use a Docker or Apptainer/Singularity container
+2. Build and use a Apptainer/Singularity container
 
 ### Install into a Python 3.7 environment
 
