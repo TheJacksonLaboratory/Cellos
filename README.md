@@ -64,7 +64,7 @@ To build an Apptainer/Singularity container, you can use the provided `.def` fil
 apptainer build cellos.sif Cellos.def
 ```
 
-#### Building the Apptaier/Singularity container on Sumner2
+#### Building the Apptainer/Singularity container on Sumner2
 
 > [!TIP]
 > At JAX, the easiest way to build containers from the definitions in this repository is to use the `build` partition on Sumner2.
@@ -74,7 +74,7 @@ You can access it from a login node by using:
 ```bash
 sinteractive -p build -q build
 ```
-Load the needed sigularity/apptainer module (note that `singularity` can be used interchangeably with the new name `apptainer`):
+Load the needed singularity/apptainer module (note that `singularity` can be used interchangeably with the new name `apptainer`):
 ```
 module load singularity
 ```
@@ -88,7 +88,7 @@ or download the container definition and the Python requirements.txt (lock)file:
 wget https://github.com/TheJacksonLaboratory/Cellos/raw/refs/heads/master/Cellos.def
 ```
 
-Eitherway, using the build partition, ensure you are in the directory with the definition and requirements.txt file and then you can build the container using [`singularity build`](https://apptainer.org/docs/user/1.1/build_a_container.html) :
+Either way, using the build partition, ensure you are in the directory with the definition and requirements.txt file and then you can build the container using [`singularity build`](https://apptainer.org/docs/user/1.1/build_a_container.html) :
 
 ```
 singularity build cellos.sif Cellos.def
@@ -107,7 +107,7 @@ Once you see `INFO:    Build complete: cellos.sif` you can end the session using
 ## Running the pipeline
 
 There are two main steps to run the pipeline: 
-1. Organanizing images and organoids segmentation. 
+1. Organizing images and organoids segmentation. 
 2. Nuclei segmentation
 
 Each of these can be run on an individual well using a plain `bash` script or as an `sbatch` script. To run on a whole plate, the script uses `sbatch` to launch jobs on a SLURM HPC cluster. The `sbatch` settings have been optimized using the sample data set and the JAX Sumner2 cluster.
