@@ -53,7 +53,7 @@ This will ensure you install the exact packages that we've tested.
 To build an Apptainer/Singularity container, you can use the provided `Cellos.def` file (either clone the repository or wget/curl the `.def` file):
 
 ```bash
-apptainer build cellos.sif Cellos.def
+apptainer build Cellos.sif Cellos.def
 ```
 
 > [!NOTE]
@@ -62,7 +62,7 @@ apptainer build cellos.sif Cellos.def
 > To build the Docker container, you can use the provided `Dockerfile` after cloning the repository:
 > 
 > ```bash
-> docker build -t cellos .
+> docker build -t Cellos .
 > ```
 
 
@@ -93,15 +93,15 @@ wget https://github.com/TheJacksonLaboratory/Cellos/raw/refs/heads/master/Cellos
 Either way, using the build partition, ensure you are in the directory with the definition and requirements.txt file and then you can build the container using [`singularity build`](https://apptainer.org/docs/user/1.1/build_a_container.html) :
 
 ```
-singularity build cellos.sif Cellos.def
+singularity build Cellos.sif Cellos.def
 ```
 > [!NOTE]
 > This will take a few minutes! It will download an image, install packages, build the python environment, and then write the resultant .sif file.
 
-Once you see `INFO:    Build complete: cellos.sif` you can end the session using `exit`.
+Once you see `INFO:    Build complete: Cellos.sif` you can end the session using `exit`.
 
 > [!TIP]
-> You can now add this container to your `PATH` variable to ensure you can use it from other (sub)directories. Ensure you are in the same directory as the `cellos.sif` file and run:
+> You can now add this container to your `PATH` variable to ensure you can use it from other (sub)directories. Ensure you are in the same directory as the `Cellos.sif` file and run:
 > ```
 > export PATH=$PATH:$(pwd)
 > ```
@@ -128,7 +128,7 @@ Each of these can be run on an individual well using a plain `bash` script or as
 > ```
 > Otherwise, provide the path to your Python 3.7 interpreter in the `PYTHONPATH` variable.
 >  
-> **If you are using the Apptainer/Singularity container for the Python interpreter, then set the `PYTHONPATH` to the path of the build container `cellos.sif`.**  
+> **If you are using the Apptainer/Singularity container for the Python interpreter, then set the `PYTHONPATH` to the path of the build container `cellos.sif`. If followed the above instructions and added the container directory to your `PATH` you can use: `PYTHONPATH=Cellos.sif` in the commands below.**  
 >
 > You may also need to ensure the scripts are executable using:
 > ```bash
