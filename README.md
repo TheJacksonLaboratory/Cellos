@@ -85,18 +85,18 @@ To build the container either clone the repository:
 ```
 git clone https://github.com/TheJacksonLaboratory/Cellos.git
 ```
-or download the container definition and the Python requirements.txt (lock)file:
+or download the container definition:
 ```
 wget https://github.com/TheJacksonLaboratory/Cellos/raw/refs/heads/master/Cellos.def
 ```
 
-Either way, using the build partition, ensure you are in the directory with the definition and requirements.txt file and then you can build the container using [`singularity build`](https://apptainer.org/docs/user/1.1/build_a_container.html) :
+Either way, using the build partition, ensure you are in the directory with the definition `Cellos.def` file and then you can build the container using [`singularity build`](https://apptainer.org/docs/user/1.1/build_a_container.html) :
 
 ```
 singularity build Cellos.sif Cellos.def
 ```
 > [!NOTE]
-> This will take a few minutes! It will download an image, install packages, build the python environment, and then write the resultant .sif file.
+> This will take a few minutes! It will download an image, install packages, build the python environment, and then write the resultant `.sif` file.
 
 Once you see `INFO:    Build complete: Cellos.sif` you can end the session using `exit`.
 
