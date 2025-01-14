@@ -17,6 +17,13 @@
 The image data used here were exported from the *PerkinElmer* Opera Phenix high content screening confocal microscope. The resulting folder contains subfolders with tiff files (Images) and xml files (metadata). Each tiff file was a single image from one well, one field, one plane and one channel. We developed an automatic protocol that organized all tiff files from same well and saved them as zarr arrays to minimize RAM and storage. All information for the images are deconvoluted from the respective metadata files. 
 
 ## Installing the pipeline
+
+We provide two ways to install the pipeline:
+1. Install into a Python 3.7 environment using `conda` or `pip`
+2. Build and use a Apptainer/Singularity container
+
+### Install into a Python 3.7 environment
+
 Currently, the pipeline uses a Python 3.7 environment. We provide a defined `requirements.txt` to install all packages and dependencies for a working environment on Rocky 9 Linux.  
 We recommend creating a virtual environment for running the pipeline, for example using [`conda`](https://conda-forge.org/download/).
  
@@ -41,10 +48,73 @@ This will ensure you install the exact packages that we've tested.
 > - At present we've tested the pipeline only on Centos 7 and Rocky 9 Linux and using Python 3.7.
 > - The provided environment does not include additional packages required for specific GPU support, e.g. CUDA.
 
+### Build and use Apptainer/Singularity container
+
+To build an Apptainer/Singularity container, you can use the provided `Cellos.def` file (either clone the repository or wget/curl the `.def` file):
+
+```bash
+apptainer build Cellos.sif Cellos.def
+```
+
+> [!NOTE]
+> As a convenience, we also provide a `Dockerfile`, however this has not been extensively tested and is not supported in our computing environment, so we cannot offer any support or universal advice on using it.
+> 
+> To build the Docker container, you can use the provided `Dockerfile` after cloning the repository:
+> 
+> ```bash
+> docker build -t Cellos .
+> ```
+
+
+#### Building the Apptainer/Singularity container on Sumner2
+
+> [!TIP]
+> At JAX, the easiest way to build containers from the definitions in this repository is to use the `build` partition on Sumner2.
+> For more details regarding accessing and using this JAX-specific resource, please see [the instructions in SharePoint](https://jacksonlaboratory.sharepoint.com/sites/ResearchIT/SitePages/JAX-HPC-Pro-Tip.aspx).
+
+You can access it from a login node by using:  
+```bash
+sinteractive -p build -q build
+```
+
+> [!TIP]
+>  `singularity` and `apptainer` can be used interchangeably in all of these commands.
+
+Load the needed singularity/apptainer module:
+```
+module load singularity
+```
+
+To build the container either clone the repository:
+```
+git clone https://github.com/TheJacksonLaboratory/Cellos.git
+```
+or download the container definition:
+```
+wget https://github.com/TheJacksonLaboratory/Cellos/raw/refs/heads/master/Cellos.def
+```
+
+Either way, using the build partition, ensure you are in the directory with the definition `Cellos.def` file and then you can build the container using [`singularity build`](https://apptainer.org/docs/user/1.1/build_a_container.html) :
+
+```
+singularity build Cellos.sif Cellos.def
+```
+> [!NOTE]
+> This will take a few minutes! It will download an image, install packages, build the python environment, and then write the resultant `.sif` file.
+
+Once you see `INFO:    Build complete: Cellos.sif` you can end the session using `exit`.
+
+> [!TIP]
+> You can now add the directory enclosing the container to your `PATH` variable to ensure you can use it from other (sub)directories. Ensure you are in the same directory as the `Cellos.sif` file and run:
+> ```
+> export PATH=$PATH:$(pwd)
+> ```
+> Alternatively, you can copy/build the `Cellos.sif` container to a directory already in your `PATH`, e.g. a `/bin` directory in your home directory.
+
 ## Running the pipeline
 
 There are two main steps to run the pipeline: 
-1. Organanizing images and organoids segmentation. 
+1. Organizing images and organoids segmentation. 
 2. Nuclei segmentation
 
 Each of these can be run on an individual well using a plain `bash` script or as an `sbatch` script. To run on a whole plate, the script uses `sbatch` to launch jobs on a SLURM HPC cluster. The `sbatch` settings have been optimized using the sample data set and the JAX Sumner2 cluster.
@@ -61,7 +131,10 @@ Each of these can be run on an individual well using a plain `bash` script or as
 > ```bash
 > conda activate organoid
 > ```
-> Otherwise, provice the path to your Python 3.7 interpreter in the `PYTHONPATH` variable.
+> Otherwise, provide the path to your Python 3.7 interpreter in the `PYTHONPATH` variable.
+>  
+> **If you are using the Apptainer/Singularity container for the Python interpreter, then set the `PYTHONPATH` to the path of the build container `cellos.sif`. If followed the above instructions and added the container directory to your `PATH` you can use: `PYTHONPATH=Cellos.sif` in the commands below.**  
+>
 > You may also need to ensure the scripts are executable using:
 > ```bash
 > chmod u+x <script name>
