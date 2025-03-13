@@ -221,7 +221,7 @@ wget https://figshare.com/ndownloader/files/39032216
 On Linux, it needs to be unziped using [7z](https://www.7-zip.org):
 
 ```bash
-7z x 39032216
+7zz x 39032216
 ```
 
 This will extract a `cellos_data` folder consisting of images (`.tiff`) and `Index.idx.xml` (metadata) file.
